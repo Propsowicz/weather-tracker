@@ -1,0 +1,338 @@
+{% extends 'base-page.html' %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+    
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+
+</head>
+<body>
+
+{% block charts %}
+    <main>
+        <div class="main-charts">
+            <div class="chart-box">
+                <h2>Temperature - Kielce</h2>
+                <div class="temp-chart">
+                    <div class="chart">
+                        <canvas id="tempChart"></canvas>
+                    </div>                
+                    <div class="chart-info">
+                        <div class="inside-chart-info">
+                            <p><br>                          
+                                Hello!
+                            </p><br><br> 
+                            <p>
+                                The application collects real weather measurments and compares them with three different weather forecasts.
+                            </p><br><br> 
+                            <p>
+                                The data is gathered from yesterday's forecasts and compared with today's measurments hour by hour.  
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+            <div class="chart-box">
+                <h2>Wind speed - Kielce</h2>
+                <div class="wind-chart">                               
+                    <div class="chart-info">
+                        <div class="inside-chart-info">
+                            <p>                             
+                                The application works in task que schedule:
+                            </p><br>
+                            <p>
+                                - everyday, at 6pm, the application web scraps tomorrow's forecasts,
+                            </p><br>
+                            <p>
+                                - for every hour, the application calls OpenWeather API for current weather data.
+                            </p><br>
+                            <p>
+                                - for every 30 minutes, the application checks for thunderstorm, and, eventually, sends the alert to the user.
+                            </p>                          
+                        </div>    
+                    </div>
+                    <div class="chart">
+                        <canvas id="windChart"></canvas>
+                    </div> 
+                </div>
+            </div>
+        </div>
+
+   
+    </main>
+{% endblock %}
+
+
+
+{% block scripts %}
+<script >   
+    var endpoint = 'api/data'
+    $.ajax({
+        method: 'GET',
+        url: endpoint,
+        success: function(weather_data){
+            console.log(weather_data)
+            temp_chart(weather_data)
+            wind_chart(weather_data)
+        },
+        error: function(weather_data){
+            console.log('error')
+        }
+    })
+
+    
+    function temp_chart(data){
+
+        let hours_list = data.hours_list
+        let measurement_temp_list = data.measurement_temp_list
+        let forecast_1_temp_list = data.forecast_1_temp_list
+        let forecast_2_temp_list = data.forecast_2_temp_list
+        let forecast_3_temp_list = data.forecast_3_temp_list
+
+      
+
+        const labels = hours_list;
+        const chart_data = {
+            labels: labels,
+            datasets: [{
+                label: 'Real temperature',
+                backgroundColor: 'rgb(255, 0, 0)',
+                borderColor: 'rgb(255, 0, 0)',
+                data: measurement_temp_list,
+                },
+                {
+                label: 'Forecast #1',
+                backgroundColor: 'rgb(0, 204, 0)',
+                borderColor: 'rgb(0, 204, 0)',
+                data: forecast_1_temp_list,
+                },
+                {
+                label: 'Forecast #2',
+                backgroundColor: 'rgb(255, 255, 26)',
+                borderColor: 'rgb(255, 255, 26)',
+                data: forecast_2_temp_list,
+                },
+                {
+                label: 'Forecast #3',
+                backgroundColor: 'rgb(0, 255, 255)',
+                borderColor: 'rgb(0, 255, 255)',
+                data: forecast_3_temp_list,
+                }
+            ]
+        };
+
+        const config = {
+            type: 'line',
+            data: chart_data,
+            options: {
+                plugins: {
+                    legend: {
+                        labels:{
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                    },
+                },
+                scales:{
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'last 24 hours',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'temperature [°C]',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },
+                                        
+                },
+
+            }
+        };
+
+        const myChart = new Chart(document.getElementById('tempChart'),
+        config  
+        );
+    }
+
+    function wind_chart(data){
+
+    let hours_list = data.hours_list
+    let measurement_wind_list = data.measurement_wind_list
+    let forecast_1_wind_list = data.forecast_1_wind_list
+    let forecast_2_wind_list = data.forecast_2_wind_list
+    let forecast_3_wind_list = data.forecast_3_wind_list
+
+
+
+    const labels = hours_list;
+    const chart_data = {
+            labels: labels,
+            datasets: [{
+                label: 'Real wind speed',
+                backgroundColor: 'rgb(255, 0, 0)',
+                borderColor: 'rgb(255, 0, 0)',
+                data: measurement_wind_list,
+                },
+                {
+                label: 'Forecast #1',
+                backgroundColor: 'rgb(0, 204, 0)',
+                borderColor: 'rgb(0, 204, 0)',
+                data: forecast_1_wind_list,
+                },
+                {
+                label: 'Forecast #2',
+                backgroundColor: 'rgb(255, 255, 26)',
+                borderColor: 'rgb(255, 255, 26)',
+                data: forecast_2_wind_list,
+                },
+                {
+                label: 'Forecast #3',
+                backgroundColor: 'rgb(0, 255, 255)',
+                borderColor: 'rgb(0, 255, 255)',
+                data: forecast_3_wind_list,
+                }
+            ]
+        };
+
+        const config = {
+            type: 'line',
+            data: chart_data,
+            options: {
+                plugins: {
+                    legend: {
+                        labels:{
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                    },
+                },
+                scales:{
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'last 24 hours',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            },                         
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'wind speed [m/s]',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },
+                                        
+                },
+
+            }
+        };
+
+    const myChart = new Chart(document.getElementById('windChart'),
+    config  
+    );
+    }    
+
+</script>
+<script>
+    let lightMode = 1 // 1 = dark; 0 = light
+    const bulb = document.querySelector('#bulb')
+    const articleDiv = document.querySelectorAll('.chart-box')
+     
+    bulb.addEventListener('click', function(){
+        if(lightMode === 1){
+            // document.body.style.backgroundColor = 'rgb(189, 190, 186)';
+            document.body.style.backgroundColor = 'white';
+            document.body.style.color = 'black'
+            for(var i = 0; i < articleDiv.length; i++){
+                articleDiv[i].classList.add('lm')            
+            }
+            lightMode = 0
+            
+        }else{
+            document.body.style.backgroundColor = 'rgb(26, 26, 26)';
+            document.body.style.color = 'white'
+            for(var i = 0; i < articleDiv.length; i++){
+                articleDiv[i].classList.remove('lm')
+            }
+            lightMode = 1
+        }
+    })    
+</script>
+
+{% endblock %}
+
+
+</body>
+
+</html>
