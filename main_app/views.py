@@ -30,6 +30,11 @@ class ListUsers(APIView):
 
     def get(self, request, format=None):
         data = render_data(DailyMeasurement)
+
+        # number of hours to render
+        hour_range = 24
+
+        # get day_id by today's date
         today = date.today()
         todays_index = -1
         for i in list(data):
@@ -37,28 +42,30 @@ class ListUsers(APIView):
             if i == str(today):
                 break
 
+        # data list:
+        data_list_ = data_list_items(data, hour_range, todays_index)
+        # analyze list:
+        analyzed_data_list = analyze_last_day(hour_range, data_list_)
+
         data = {
             'hours_list': hours_list(data, todays_index)[-24:],
-            'measurement_temp_list': data_list(data, todays_index, 'measurement', 'temperature')[-24:],
-            'forecast_1_temp_list': data_list(data, todays_index, 'forecast_1', 'temperature')[-24:],
-            'forecast_2_temp_list': data_list(data, todays_index, 'forecast_2', 'temperature')[-24:],
-            'forecast_3_temp_list': data_list(data, todays_index, 'forecast_3', 'temperature')[-24:],
-            'measurement_wind_list': data_list(data, todays_index, 'measurement', 'wind')[-24:],
-            'forecast_1_wind_list': data_list(data, todays_index, 'forecast_1', 'wind')[-24:],
-            'forecast_2_wind_list': data_list(data, todays_index, 'forecast_2', 'wind')[-24:],
-            'forecast_3_wind_list': data_list(data, todays_index, 'forecast_3', 'wind')[-24:],
-            'm_f1_avg_temp': analyze_last_day()[0],
-            'm_f2_avg_temp': analyze_last_day()[1],
-            'm_f3_avg_temp': analyze_last_day()[2],
-            'm_f1_avg_wind': analyze_last_day()[3],
-            'm_f2_avg_wind': analyze_last_day()[4],
-            'm_f3_avg_wind': analyze_last_day()[5],
-            'm_f1_avg': analyze_last_day()[6],
-            'm_f2_avg': analyze_last_day()[7],
-            'm_f3_avg': analyze_last_day()[8],
-            'm_f1_temp': analyze_last_day()[9],
-            'm_f2_temp': analyze_last_day()[10],
-            'm_f3_temp': analyze_last_day()[11],
+            'measurement_temp_list': data_list_[0],
+            'forecast_1_temp_list': data_list_[1],
+            'forecast_2_temp_list': data_list_[2],
+            'forecast_3_temp_list': data_list_[3],
+            'measurement_wind_list': data_list_[4],
+            'forecast_1_wind_list': data_list_[5],
+            'forecast_2_wind_list': data_list_[6],
+            'forecast_3_wind_list': data_list_[7],
+            'm_f1_avg_temp': analyzed_data_list[0],
+            'm_f2_avg_temp': analyzed_data_list[1],
+            'm_f3_avg_temp': analyzed_data_list[2],
+            'm_f1_avg_wind': analyzed_data_list[3],
+            'm_f2_avg_wind': analyzed_data_list[4],
+            'm_f3_avg_wind': analyzed_data_list[5],
+            'm_f1_temp': analyzed_data_list[6],
+            'm_f2_temp': analyzed_data_list[7],
+            'm_f3_temp': analyzed_data_list[8],
         }
 
         return Response(data)
