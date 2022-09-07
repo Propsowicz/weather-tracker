@@ -43,6 +43,7 @@ def get_actual_weather(self):
 @shared_task(bind=True)
 def get_tomorrows_forecast(self):
     tomorrows_date = date.today() + timedelta(days=1)
+    # tomorrows_date = date.today()
     tomorrow, create = DailyMeasurement.objects.get_or_create(date=tomorrows_date)
 
     url_1 = 'https://www.meteoprog.pl/pl/meteograms/Keltse/'

@@ -16,6 +16,7 @@
 
 {% block charts %}
     <main>
+
         <div class="main-charts">
             <div class="chart-box">
                 <h2>Temperature - Kielce</h2>
@@ -64,6 +65,11 @@
             </div>
         </div>
 
+        <canvas id="gauss24Chart"></canvas>
+        <canvas id="deltaTchart"></canvas>
+
+        
+
    
     </main>
 {% endblock %}
@@ -80,6 +86,8 @@
             console.log(weather_data)
             temp_chart(weather_data)
             wind_chart(weather_data)
+            gauss_24_chart(weather_data)
+            deltaTchart(weather_data)
         },
         error: function(weather_data){
             console.log('error')
@@ -302,6 +310,196 @@
     config  
     );
     }    
+    
+    function deltaTchart(data){   
+
+    const labels = data.hours_list;
+
+    const chart_data = {
+        labels: labels,
+        datasets: [{
+            label: 'Forecast #1',            
+            data: data.m_f1_temp,
+            backgroundColor: 'rgb(0, 204, 0)',
+            borderColor: 'rgb(0, 204, 0)',            
+        },
+        {
+            label: 'Forecast #2',            
+            data: data.m_f2_temp,
+            backgroundColor: 'rgb(255, 255, 26)',
+            borderColor: 'rgb(255, 255, 26)',            
+        },
+        {
+            label: 'Forecast #3',            
+            data: data.m_f3_temp,
+            backgroundColor: 'rgb(0, 255, 255)',
+            borderColor: 'rgb(0, 255, 255)',            
+        },
+    ]}            
+    const config = {
+        type: 'bar',
+        data: chart_data,
+        options: {
+            plugins: {
+                legend: {
+                    labels:{
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                },
+            },
+            scales:{                
+                x:{
+                    title: {
+                        display: true,
+                        text: 'Delta T [°C] ',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    
+                },
+                y: {
+                    title: {
+                        display: true,
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                                    
+            },
+
+        }
+    };
+
+const myChart = new Chart(document.getElementById('deltaTchart'),
+config  
+);
+}
+
+    function gauss_24_chart(data){   
+    const chart_data = {
+        datasets: [{
+            label: 'Forecast #1',            
+            data: data.f1_gauss,
+            backgroundColor: 'rgb(0, 204, 0)',
+            borderColor: 'rgb(0, 204, 0)',
+            showLine: true,
+            tension: 0.4,
+        },
+        {
+            label: 'Forecast #2',            
+            data: data.f2_gauss,
+            backgroundColor: 'rgb(255, 255, 26)',
+            borderColor: 'rgb(255, 255, 26)',
+            showLine: true,
+            tension: 0.4,
+        },
+        {
+            label: 'Forecast #3',            
+            data: data.f3_gauss,
+            backgroundColor: 'rgb(0, 255, 255)',
+            borderColor: 'rgb(0, 255, 255)',
+            showLine: true,
+            tension: 0.4,
+        },
+    ]}            
+    const config = {
+        type: 'scatter',
+        data: chart_data,
+        options: {
+            plugins: {
+                legend: {
+                    labels:{
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                },
+            },
+            scales:{
+                
+                x:{
+                    type: 'linear',
+                    title: {
+                        display: true,
+                        text: 'Delta T [°C] ',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    
+                },
+                y: {
+                    title: {
+                        display: true,
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                                    
+            },
+
+        }
+    };
+
+const myChart = new Chart(document.getElementById('gauss24Chart'),
+config  
+);
+}
 
 </script>
 <script>

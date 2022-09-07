@@ -1,6 +1,7 @@
 from datetime import date
 from .models import *
-from statistics import mean
+from statistics import mean, stdev
+import numpy as np
 
 def render_data(DailyMeasurement):
     analyzed_days = DailyMeasurement.objects.all().order_by('id')
@@ -30,36 +31,34 @@ def render_data(DailyMeasurement):
         data[str(day.date)] = daily_data
     return data
 
-def hours_list(data, index):
+def hours_list(days, data, index):
     new_list = []
-    for i in data[(list(data)[index - 1])]:
-        new_list.append(f'{list(data)[index - 1]}:{i}:00')
-    for i in data[(list(data)[index])]:
-        new_list.append(f'{list(data)[index]}:{i}:00')
+    for _ in range(days):
+        for i in data[(list(data)[index - (days - _)])]:
+            new_list.append(f'{list(data)[index - 1]}:{i}:00')
 
     return new_list
 
-def data_list(data, index, key, value):
+def data_list(days, data, index, key, value):
     new_list = []
-    for i in data[(list(data)[index - 1])]:
-        new_list.append(data[(list(data)[index - 1])][i][key][value])
-    for i in data[(list(data)[index])]:
-        new_list.append(data[(list(data)[index])][i][key][value])
+    for _ in range(days):
+        for i in data[(list(data)[index - (days - _)])]:
+            new_list.append(data[(list(data)[index - (days - _)])][i][key][value])
 
     return new_list
 
 def add_forecast(model, day, function, key):
     model.objects.create(day=day, hour=function[0][key], temperature=function[1][key], wind_speed=function[2][key])
 
-def data_list_items(data, hour_range, todays_index):
-    measurement_temp_list = data_list(data, todays_index, 'measurement', 'temperature')[-hour_range:]
-    forecast_1_temp_list = data_list(data, todays_index, 'forecast_1', 'temperature')[-hour_range:]
-    forecast_2_temp_list = data_list(data, todays_index, 'forecast_2', 'temperature')[-hour_range:]
-    forecast_3_temp_list = data_list(data, todays_index, 'forecast_3', 'temperature')[-hour_range:]
-    measurement_wind_list = data_list(data, todays_index, 'measurement', 'wind')[-hour_range:]
-    forecast_1_wind_list = data_list(data, todays_index, 'forecast_1', 'wind')[-hour_range:]
-    forecast_2_wind_list = data_list(data, todays_index, 'forecast_2', 'wind')[-hour_range:]
-    forecast_3_wind_list = data_list(data, todays_index, 'forecast_3', 'wind')[-hour_range:]
+def data_list_items(days, data, hour_range, todays_index):
+    measurement_temp_list = data_list(days, data, todays_index, 'measurement', 'temperature')[-hour_range:]
+    forecast_1_temp_list = data_list(days, data, todays_index, 'forecast_1', 'temperature')[-hour_range:]
+    forecast_2_temp_list = data_list(days, data, todays_index, 'forecast_2', 'temperature')[-hour_range:]
+    forecast_3_temp_list = data_list(days, data, todays_index, 'forecast_3', 'temperature')[-hour_range:]
+    measurement_wind_list = data_list(days, data, todays_index, 'measurement', 'wind')[-hour_range:]
+    forecast_1_wind_list = data_list(days, data, todays_index, 'forecast_1', 'wind')[-hour_range:]
+    forecast_2_wind_list = data_list(days, data, todays_index, 'forecast_2', 'wind')[-hour_range:]
+    forecast_3_wind_list = data_list(days, data, todays_index, 'forecast_3', 'wind')[-hour_range:]
 
     return measurement_temp_list, forecast_1_temp_list, forecast_2_temp_list, forecast_3_temp_list, measurement_wind_list, forecast_1_wind_list, forecast_2_wind_list, forecast_3_wind_list
 
@@ -78,27 +77,27 @@ def analyze_last_day(hour_range, data_list_):
     abs_m_f3_temp, abs_m_f3_wind = [], []
 
     for i in range(hour_range):
-        f = round(data_list_[0][i] - data_list_[1][i], 2)
+        f = round(data_list_[1][i] - data_list_[0][i], 2)
         m_f1_temp.append(f)
         abs_m_f1_temp.append(abs(f))
     for i in range(hour_range):
-        f = round(data_list_[0][i] - data_list_[2][i], 2)
+        f = round(data_list_[2][i] - data_list_[0][i], 2)
         m_f2_temp.append(f)
         abs_m_f2_temp.append(abs(f))
     for i in range(hour_range):
-        f = round(data_list_[0][i] - data_list_[3][i], 2)
+        f = round(data_list_[3][i] - data_list_[0][i], 2)
         m_f3_temp.append(f)
         abs_m_f3_temp.append(abs(f))
     for i in range(hour_range):
-        f = round(data_list_[4][i] - data_list_[5][i], 2)
+        f = round(data_list_[5][i] - data_list_[4][i], 2)
         m_f1_wind.append(f)
         abs_m_f1_wind.append(abs(f))
     for i in range(hour_range):
-        f = round(data_list_[4][i] - data_list_[6][i], 2)
+        f = round(data_list_[6][i] - data_list_[4][i], 2)
         m_f2_wind.append(f)
         abs_m_f2_wind.append(abs(f))
     for i in range(hour_range):
-        f = round(data_list_[4][i] - data_list_[7][i], 2)
+        f = round(data_list_[7][i] - data_list_[4][i], 2)
         m_f3_wind.append(f)
         abs_m_f3_wind.append(abs(f))
 
@@ -112,6 +111,20 @@ def analyze_last_day(hour_range, data_list_):
     m_f2_avg_wind = round(mean(abs_m_f2_wind), 2)
     m_f3_avg_wind = round(mean(abs_m_f3_wind), 2)
 
-    return m_f1_avg_temp, m_f2_avg_temp, m_f3_avg_temp, m_f1_avg_wind, m_f2_avg_wind, m_f3_avg_wind, m_f1_temp, m_f2_temp, m_f3_temp
+    # creating gauss function
+    def Gauss_func(list, mean, st_dev):
+        gauss_pts = []
+        for x in sorted(list):
+            f1 = pow(np.e, -(float(x) - mean)**2 / (2 * st_dev**2))
+            f2 = 1 / np.sqrt(2 * np.pi * st_dev**2)
+            f = f1 * f2
+            gauss_pts.append({'x': x, 'y': f})
+        return gauss_pts
+
+    f1_gauss = Gauss_func(m_f1_temp, float(mean(m_f1_temp)), float(stdev(m_f1_temp)))
+    f2_gauss = Gauss_func(m_f2_temp, float(mean(m_f2_temp)), float(stdev(m_f2_temp)))
+    f3_gauss = Gauss_func(m_f3_temp, float(mean(m_f3_temp)), float(stdev(m_f3_temp)))
+
+    return m_f1_avg_temp, m_f2_avg_temp, m_f3_avg_temp, m_f1_avg_wind, m_f2_avg_wind, m_f3_avg_wind, m_f1_temp, m_f2_temp, m_f3_temp, f1_gauss, f2_gauss, f3_gauss
 
 

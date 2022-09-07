@@ -31,9 +31,6 @@ class ListUsers(APIView):
     def get(self, request, format=None):
         data = render_data(DailyMeasurement)
 
-        # number of hours to render
-        hour_range = 24
-
         # get day_id by today's date
         today = date.today()
         todays_index = -1
@@ -42,13 +39,18 @@ class ListUsers(APIView):
             if i == str(today):
                 break
 
+        # days to render
+        days_to_render = 1
+        days = days_to_render + 1
+        hour_range = (days - 1 ) * 24
+
         # data list:
-        data_list_ = data_list_items(data, hour_range, todays_index)
+        data_list_ = data_list_items(days, data, hour_range, todays_index)
         # analyze list:
         analyzed_data_list = analyze_last_day(hour_range, data_list_)
 
         data = {
-            'hours_list': hours_list(data, todays_index)[-24:],
+            'hours_list': hours_list(days, data, todays_index)[-24:],
             'measurement_temp_list': data_list_[0],
             'forecast_1_temp_list': data_list_[1],
             'forecast_2_temp_list': data_list_[2],
@@ -66,6 +68,9 @@ class ListUsers(APIView):
             'm_f1_temp': analyzed_data_list[6],
             'm_f2_temp': analyzed_data_list[7],
             'm_f3_temp': analyzed_data_list[8],
+            'f1_gauss': analyzed_data_list[9],
+            'f2_gauss': analyzed_data_list[10],
+            'f3_gauss': analyzed_data_list[11],
         }
 
         return Response(data)
