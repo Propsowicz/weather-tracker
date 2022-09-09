@@ -100,35 +100,38 @@ nav{
     background-color: var(--col-prm1);
     margin-top: 0rem;
     height: 3rem;
-    width: 100%;
-    
+    width: 100%;  
+    display: grid;  
+    grid-template-columns: 48% 48% 4%;
+  
     position: fixed;
     z-index: 999;
 }
 nav img{
     float: right;
-    margin-top: -3rem;
+    margin-top: 0.5rem;
     margin-right: 1rem;
 }
-nav img:hover{
+nav div img:hover{
     cursor: pointer;
     filter: invert();
 }
-nav ul{
+nav div ul{
     margin-top: 0.8rem;
     list-style: none;   
     text-align: center;
 }
-nav ul li{
+nav div ul li{
     display: inline;
     margin-inline-start: 0.5rem;
     margin-inline-end: 0.5rem;
 }
-nav ul li a{
+nav div ul li a{
     text-decoration: none;
     color: var(--col-black);
 }
-nav ul li a:hover{
+nav div ul li a:hover{
+    cursor: pointer;
     transition: cubic-bezier(0.785, 0.135, 0.15, 0.86);
     text-decoration: underline solid var(--col-act) 2px;
     text-underline-offset: 0.3rem;

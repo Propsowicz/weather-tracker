@@ -7,10 +7,11 @@ from .views import *
 urlpatterns = [
 
     path('', HomePage, name='home-page'),
+    path('elo', chartXscale, name='chart-x-scale'),
 
 
 
 
 
-    path('api/data', ListUsers.as_view()),
+    path('api/data', ListUsers.as_view(), name='api-view'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

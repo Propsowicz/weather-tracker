@@ -134,8 +134,13 @@ def forecast_3(url):  # 'https://weather.com/pl-PL/pogoda/godzinowa/l/08b809af5f
         looped_sibling = looped_sibling.next_sibling
 
     return hours_list, temp_list, wind_list
-
+#
 # print(forecast_1(url))
 # print(forecast_2(url1))
 # print(forecast_3(url2))
+
+
+
+
+
 

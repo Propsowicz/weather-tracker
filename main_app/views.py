@@ -1,4 +1,7 @@
+import json
 import os
+
+from django.http import JsonResponse
 from django.shortcuts import render
 from .models import *
 # Create your views here.
@@ -29,7 +32,18 @@ class ListUsers(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-        data = render_data(DailyMeasurement)
+
+
+        # days to render
+        if request.session.get('days_to_render'):
+            days_to_render = int(request.session.get('days_to_render'))
+        else:
+            days_to_render = 3
+
+        days = days_to_render + 2
+        hour_range = days_to_render * 24
+
+        data = render_data(DailyMeasurement, days)
 
         # get day_id by today's date
         today = date.today()
@@ -39,18 +53,14 @@ class ListUsers(APIView):
             if i == str(today):
                 break
 
-        # days to render
-        days_to_render = 1
-        days = days_to_render + 1
-        hour_range = (days - 1 ) * 24
-
         # data list:
         data_list_ = data_list_items(days, data, hour_range, todays_index)
         # analyze list:
-        analyzed_data_list = analyze_last_day(hour_range, data_list_)
+        analyzed_data_list = analyze_current_weather(hour_range, data_list_)
 
         data = {
-            'hours_list': hours_list(days, data, todays_index)[-24:],
+            'data': data,
+            'hours_list': hours_list(days, data, todays_index)[-hour_range:],
             'measurement_temp_list': data_list_[0],
             'forecast_1_temp_list': data_list_[1],
             'forecast_2_temp_list': data_list_[2],
@@ -74,3 +84,10 @@ class ListUsers(APIView):
         }
 
         return Response(data)
+
+def chartXscale(request):
+    days_to_render = json.loads(request.body)
+
+    request.session['days_to_render'] = days_to_render
+
+    return JsonResponse('cart is completed', safe=False)

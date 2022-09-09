@@ -1,4 +1,6 @@
+import multiprocessing
 import os
+import concurrent.futures
 
 from django.contrib.auth import get_user_model
 
@@ -50,10 +52,11 @@ def get_tomorrows_forecast(self):
     url_2 = 'https://pogoda.interia.pl/prognoza-szczegolowa-kielce,cId,13378'
     url_3 = 'https://weather.com/pl-PL/pogoda/godzinowa/l/08b809af5fb69a30123db9d3475cb38269a485132a1863d847de90ebd3d7962e'
 
-
     for i in range(24):
         add_forecast(Forecast_1, tomorrow, forecast_1(url_1), i)
         add_forecast(Forecast_2, tomorrow, forecast_2(url_2), i)
         add_forecast(Forecast_3, tomorrow, forecast_3(url_3), i)
+
+
 
     return 'Data has been added..'

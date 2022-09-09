@@ -1,10 +1,12 @@
-from datetime import date
+from datetime import date, timedelta, time, datetime
 from .models import *
 from statistics import mean, stdev
 import numpy as np
 
-def render_data(DailyMeasurement):
-    analyzed_days = DailyMeasurement.objects.all().order_by('id')
+def render_data(DailyMeasurement, days):
+    first_day_to_render = date.today() - timedelta(days=days)
+    analyzed_days = DailyMeasurement.objects.all().filter(date__gte=first_day_to_render).order_by('id')
+
     data = {}
     for day in analyzed_days:
         daily_data = {}
@@ -34,16 +36,16 @@ def render_data(DailyMeasurement):
 def hours_list(days, data, index):
     new_list = []
     for _ in range(days):
-        for i in data[(list(data)[index - (days - _)])]:
-            new_list.append(f'{list(data)[index - 1]}:{i}:00')
+        for i in data[(list(data)[index - (days - _ - 1)])]:
+            new_list.append(f'{list(data)[index - (days - _ - 1)]}:{i}:00')
 
     return new_list
 
 def data_list(days, data, index, key, value):
     new_list = []
     for _ in range(days):
-        for i in data[(list(data)[index - (days - _)])]:
-            new_list.append(data[(list(data)[index - (days - _)])][i][key][value])
+        for i in data[(list(data)[index - (days - _ - 1)])]:
+            new_list.append(data[(list(data)[index - (days - _ - 1)])][i][key][value])
 
     return new_list
 
@@ -62,9 +64,11 @@ def data_list_items(days, data, hour_range, todays_index):
 
     return measurement_temp_list, forecast_1_temp_list, forecast_2_temp_list, forecast_3_temp_list, measurement_wind_list, forecast_1_wind_list, forecast_2_wind_list, forecast_3_wind_list
 
-def analyze_last_day(hour_range, data_list_):
-
+def analyze_current_weather(hour_range, data_list_):
     assert hour_range == len(data_list_[0]), 'data is not updated - need to change ranges in belows loops (list has [hours_range - 1] length)'
+    # ok już wiem co jest z tym błędem:
+    # jak mam poprzedni dzień z 22 godzinami to brakuje mu jednej godziny żeby mieć na liście 24 pozycje
+    # i się krzaczy bo ma tylko 23...
 
     # lists naming code: m_f1_temp -> measurement_forecast1_temperature analysis
     m_f1_temp, m_f1_wind = [], []
