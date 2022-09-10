@@ -1,7 +1,8 @@
+from datetime import date
+
 from bs4 import *
 import lxml
 import requests
-
 # url = 'https://pl.meteopost.com/pogoda/kielce-sukow/'
 
 
@@ -138,7 +139,6 @@ def forecast_3(url):  # 'https://weather.com/pl-PL/pogoda/godzinowa/l/08b809af5f
 # print(forecast_1(url))
 # print(forecast_2(url1))
 # print(forecast_3(url2))
-
 
 
 

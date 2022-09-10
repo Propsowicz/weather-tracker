@@ -157,7 +157,7 @@ main{
     padding: 1rem;
     margin-top: 1rem;
     border-radius: 0.5rem;
-    padding-bottom: 2rem;
+    padding-bottom: 3rem;
 }
 .chart-box h2{
     text-align: center;
@@ -165,16 +165,17 @@ main{
 }
 
 .temp-chart{
+    width: 100%;
     display: grid;
     column-gap: 1rem;
-    grid-template-columns: 75% 20%;
+    grid-template-columns: 78.5% 20%;
 }
 .wind-chart{
     display: grid;
     column-gap: 1rem;
-    grid-template-columns: 20% 75%;
+    grid-template-columns: 20% 78.5%;
 }
-.chart-info{
+.chart-info{  
     height: auto;
     display: flex;
     align-items: center;
@@ -272,8 +273,8 @@ br{
     /* dark/light mode -- start */
 .lm{
     /* background-color: rgb(189, 190, 186); */
-    background-color: var(--col-prm4);
-    box-shadow: 0px 0px 54px -34px rgba(200, 230, 102, 1);
+    background-color: white;
+    /* box-shadow: 0px 0px 54px -34px rgb(164, 207, 22); */
 }
 
     /* dark/light mode -- end */

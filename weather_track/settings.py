@@ -150,3 +150,6 @@ CELERY_RESULT_BACKEND = 'django-db'
 # celery beat
 #
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+SMS_BACKEND = 'sms.backends.console.SmsBackend'

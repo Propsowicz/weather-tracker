@@ -2,6 +2,8 @@ from datetime import date, timedelta, time, datetime
 from .models import *
 from statistics import mean, stdev
 import numpy as np
+from sms import send_sms
+
 
 def render_data(DailyMeasurement, days):
     first_day_to_render = date.today() - timedelta(days=days)
@@ -129,6 +131,44 @@ def analyze_current_weather(hour_range, data_list_):
     f2_gauss = Gauss_func(m_f2_temp, float(mean(m_f2_temp)), float(stdev(m_f2_temp)))
     f3_gauss = Gauss_func(m_f3_temp, float(mean(m_f3_temp)), float(stdev(m_f3_temp)))
 
-    return m_f1_avg_temp, m_f2_avg_temp, m_f3_avg_temp, m_f1_avg_wind, m_f2_avg_wind, m_f3_avg_wind, m_f1_temp, m_f2_temp, m_f3_temp, f1_gauss, f2_gauss, f3_gauss
+    stat_data = {
+        'hours': hour_range,
+        'forecast_1': {
+            't_mean': m_f1_avg_temp,
+            'w_mean': m_f1_avg_wind,
+            't_spread': max(m_f1_temp),
+            'w_spread': max(m_f1_wind),
+        },
+        'forecast_2': {
+            't_mean': m_f2_avg_temp,
+            'w_mean': m_f2_avg_wind,
+            't_spread': max(m_f2_temp),
+            'w_spread': max(m_f2_wind),
+        },
+        'forecast_3': {
+            't_mean': m_f3_avg_temp,
+            'w_mean': m_f3_avg_wind,
+            't_spread': max(m_f3_temp),
+            'w_spread': max(m_f3_wind),
+        },
+    }
 
+    return stat_data, m_f1_temp, m_f2_temp, m_f3_temp, f1_gauss, f2_gauss, f3_gauss
+
+
+def send_alert(DailyMeasurement, AlertMsg):
+    todays_date = date.today()
+    today = DailyMeasurement.objects.get(date=todays_date)
+    AlertMsg.objects.all().exclude(day=today).delete()
+
+    if AlertMsg.objects.all().filter(day=today).count() == 0:
+        AlertMsg.objects.create(day=today)
+        send_sms(
+            'Uwaga! W okolicy Kielc burza!',
+            '+123456789',
+            ['+123456789'],
+            fail_silently=False
+        )
+    else:
+        pass
 

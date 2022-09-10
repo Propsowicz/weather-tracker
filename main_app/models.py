@@ -53,3 +53,9 @@ class Forecast_3(models.Model): #   'https://weather.com/pl-PL/pogoda/godzinowa/
     def __str__(self):
         return str(self.day) + ' | ' + str(self.hour)
 
+class AlertMsg(models.Model):
+    day = models.ForeignKey(DailyMeasurement, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.day)
+

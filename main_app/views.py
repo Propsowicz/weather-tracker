@@ -17,6 +17,7 @@ from .functions import *
 
 def HomePage(request):
 
+
     context = {
     }
 
@@ -32,8 +33,6 @@ class ListUsers(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-
-
         # days to render
         if request.session.get('days_to_render'):
             days_to_render = int(request.session.get('days_to_render'))
@@ -69,18 +68,13 @@ class ListUsers(APIView):
             'forecast_1_wind_list': data_list_[5],
             'forecast_2_wind_list': data_list_[6],
             'forecast_3_wind_list': data_list_[7],
-            'm_f1_avg_temp': analyzed_data_list[0],
-            'm_f2_avg_temp': analyzed_data_list[1],
-            'm_f3_avg_temp': analyzed_data_list[2],
-            'm_f1_avg_wind': analyzed_data_list[3],
-            'm_f2_avg_wind': analyzed_data_list[4],
-            'm_f3_avg_wind': analyzed_data_list[5],
-            'm_f1_temp': analyzed_data_list[6],
-            'm_f2_temp': analyzed_data_list[7],
-            'm_f3_temp': analyzed_data_list[8],
-            'f1_gauss': analyzed_data_list[9],
-            'f2_gauss': analyzed_data_list[10],
-            'f3_gauss': analyzed_data_list[11],
+            'stat_data': analyzed_data_list[0],
+            'm_f1_temp': analyzed_data_list[1],
+            'm_f2_temp': analyzed_data_list[2],
+            'm_f3_temp': analyzed_data_list[3],
+            'f1_gauss': analyzed_data_list[4],
+            'f2_gauss': analyzed_data_list[5],
+            'f3_gauss': analyzed_data_list[6],
         }
 
         return Response(data)

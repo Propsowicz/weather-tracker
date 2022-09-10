@@ -37,10 +37,7 @@ def get_actual_weather(self):
     today, create = DailyMeasurement.objects.get_or_create(date=todays_date)
     Measurement.objects.create(day=today, hour=hour, temperature=temp, pressure=press, wind_speed=wind)
 
-
     return 'Data has been added..'
-
-
 
 @shared_task(bind=True)
 def get_tomorrows_forecast(self):
@@ -57,6 +54,31 @@ def get_tomorrows_forecast(self):
         add_forecast(Forecast_2, tomorrow, forecast_2(url_2), i)
         add_forecast(Forecast_3, tomorrow, forecast_3(url_3), i)
 
-
-
     return 'Data has been added..'
+
+@shared_task(bind=True)
+def send_alert_msg(self):
+    url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=' + str(os.getenv('API_key'))
+    city = 'Kielce'
+    city_weather = requests.get(url.format(city)).json()
+    weather_state = city_weather['weather'][0]['description']
+
+    if weather_state == 'thunderstorm':
+        send_alert(DailyMeasurement, AlertMsg)
+    else:
+        pass
+
+    return 'Alert check has been performed..'
+
+
+
+
+
+
+
+
+
+
+
+
+

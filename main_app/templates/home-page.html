@@ -63,10 +63,63 @@
                     </div> 
                 </div>
             </div>
+
+            <div class="chart-box">
+                <h2>Temperature difference</h2>
+                <div class="temp-chart">
+                    <div class="chart">
+                        <canvas id="deltaTchart"></canvas>
+                    </div>                
+                    <div class="chart-info">
+                        <div class="inside-chart-info">
+                            <p><br><br><br>                          
+                                This plot shows differences in temp between measurement and forecast in last <span id="txt-hours">-</span> hours.
+                            </p><br><br><br>
+                            <p>
+                                Mean values of these differences are:
+                            </p><br><br><br>
+                            <p>
+                                - Forecast #1: <span id="txt-f-1">-</span>°C  
+                            </p><br>
+                            <p>
+                                - Forecast #2: <span id="txt-f-2">-</span>°C  
+                            </p><br>
+                            <p>
+                                - Forecast #3: <span id="txt-f-3">-</span>°C  
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+            <div class="chart-box">
+                <h2>Histogram - temperature</h2>
+                <div class="wind-chart">                               
+                    <div class="chart-info">
+                        <div class="inside-chart-info">
+                            <p><br><br><br>                             
+                                This histogram presents distribution of tempereature's differences from real measurement.                                
+                            </p><br><br><br>                          
+                            <p>
+                                The biggest spread of each forecast are:
+                            </p><br><br><br>
+                            <p>
+                                - Forecast #1: <span id="txt-fs-1">-</span>°C
+                            </p><br>
+                            <p>
+                                - Forecast #2: <span id="txt-fs-2">-</span>°C
+                            </p><br>
+                            <p>
+                                - Forecast #3: <span id="txt-fs-3">-</span>°C
+                            </p>                            
+                        </div>    
+                    </div>
+                    <div class="chart">
+                        <canvas id="gauss24Chart"></canvas>
+                    </div> 
+                </div>
+            </div>
         </div>
 
-        <canvas id="gauss24Chart"></canvas>
-        <canvas id="deltaTchart"></canvas>
 
         
 
@@ -84,18 +137,86 @@
         url: endpoint,
         success: function(weather_data){
             console.log(weather_data)
-            temp_chart(weather_data)
-            wind_chart(weather_data)
+            const xScalelength = weather_data.hours_list.length
+            
+            temp_chart(weather_data, xScalelength)
+            wind_chart(weather_data, xScalelength)            
+            deltaTchart(weather_data, xScalelength)
             gauss_24_chart(weather_data)
-            deltaTchart(weather_data)
+
+            // adding data to DOM txt
+            document.querySelector('#txt-hours').innerText = weather_data.stat_data.hours
+            document.querySelector('#txt-f-1').innerText = weather_data.stat_data.forecast_1.t_mean
+            document.querySelector('#txt-fs-1').innerText = weather_data.stat_data.forecast_1.t_spread
+            document.querySelector('#txt-f-2').innerText = weather_data.stat_data.forecast_2.t_mean
+            document.querySelector('#txt-fs-2').innerText = weather_data.stat_data.forecast_2.t_spread
+            document.querySelector('#txt-f-3').innerText = weather_data.stat_data.forecast_3.t_mean
+            document.querySelector('#txt-fs-3').innerText = weather_data.stat_data.forecast_3.t_spread
         },
         error: function(weather_data){
             console.log('error')
         }
     })
 
+    function checkMode(){
+        let lMode = localStorage.getItem('l-mode')
+        let lightMode 
+
+        if(lMode === null){
+            lightMode = 1 // 1 = dark; 0 = light
+        }else{
+            lightMode = parseInt(lMode)
+        }
+        
+        return lightMode
+    }
+
+    function darkModeChart(Chart){
+        Chart.config.options.plugins.legend.labels.color = '#e8e8e8'
+        Chart.config.options.scales.x.title.color = '#e8e8e8'
+        Chart.config.options.scales.x.grid.color = '#e8e8e8'
+        Chart.config.options.scales.x.ticks.color = '#e8e8e8'
+        Chart.config.options.scales.y.title.color = '#e8e8e8'
+        Chart.config.options.scales.y.grid.color = '#e8e8e8'
+        Chart.config.options.scales.y.ticks.color = '#e8e8e8'
+        Chart.update()
+    }
+
+    function lightModeChart(Chart){
+        Chart.config.options.plugins.legend.labels.color = 'black'
+        Chart.config.options.scales.x.title.color = 'black'
+        Chart.config.options.scales.x.grid.color = 'black'
+        Chart.config.options.scales.x.ticks.color = 'black'
+        Chart.config.options.scales.y.title.color = 'black'
+        Chart.config.options.scales.y.grid.color = 'black'
+        Chart.config.options.scales.y.ticks.color = 'black'
+        Chart.update()
+    }
+
+    function changeViewMode(Chart){
+        let lightMode = checkMode()
+        const bulb = document.querySelector('#bulb')    
+
+        if(lightMode === 1){
+            darkModeChart(Chart)                             
+        }else{
+            lightModeChart(Chart)     
+        }
+        
+        bulb.addEventListener('click', function(){
+            if(lightMode === 1){
+                lightModeChart(Chart)
+                lightMode = 0
+                localStorage.setItem('l-mode', lightMode)            
+            }else{
+                darkModeChart(Chart)
+                lightMode = 1
+                localStorage.setItem('l-mode', lightMode)
+            }
+        })
+    }
     
-    function temp_chart(data){
+    function temp_chart(data, xScalelength){
 
         let hours_list = data.hours_list
         let measurement_temp_list = data.measurement_temp_list
@@ -122,8 +243,8 @@
                 },
                 {
                 label: 'Forecast #2',
-                backgroundColor: 'rgb(255, 255, 26)',
-                borderColor: 'rgb(255, 255, 26)',
+                backgroundColor: 'rgb(0, 0, 255)',
+                borderColor: 'rgb(0, 0, 255)',
                 data: forecast_2_temp_list,
                 },
                 {
@@ -153,7 +274,7 @@
                     x:{
                         title: {
                             display: true,
-                            text: 'last 24 hours',
+                            text: 'last ' + xScalelength + ' hours',
                             color: '#e8e8e8',
                             font:{
                                 family: 'Anonymous Pro',
@@ -198,12 +319,17 @@
             }
         };
 
-        const myChart = new Chart(document.getElementById('tempChart'),
+        const tempChart = new Chart(document.getElementById('tempChart'),
         config  
         );
+        
+        // dark/light mode -- start    
+            changeViewMode(tempChart)  
+
+        // dark/light mode -- end
     }
 
-    function wind_chart(data){
+    function wind_chart(data, xScalelength){
 
     let hours_list = data.hours_list
     let measurement_wind_list = data.measurement_wind_list
@@ -230,8 +356,8 @@
                 },
                 {
                 label: 'Forecast #2',
-                backgroundColor: 'rgb(255, 255, 26)',
-                borderColor: 'rgb(255, 255, 26)',
+                backgroundColor: 'rgb(0, 0, 255)',
+                borderColor: 'rgb(0, 0, 255)',
                 data: forecast_2_wind_list,
                 },
                 {
@@ -261,7 +387,7 @@
                     x:{
                         title: {
                             display: true,
-                            text: 'last 24 hours',
+                            text: 'last ' + xScalelength + ' hours',
                             color: '#e8e8e8',
                             font:{
                                 family: 'Anonymous Pro',
@@ -306,12 +432,16 @@
             }
         };
 
-    const myChart = new Chart(document.getElementById('windChart'),
+    const windChart = new Chart(document.getElementById('windChart'),
     config  
     );
+    // dark/light mode -- start    
+        changeViewMode(windChart)  
+
+    // dark/light mode -- end
     }    
     
-    function deltaTchart(data){   
+    function deltaTchart(data, xScalelength){   
 
     const labels = data.hours_list;
 
@@ -326,8 +456,8 @@
         {
             label: 'Forecast #2',            
             data: data.m_f2_temp,
-            backgroundColor: 'rgb(255, 255, 26)',
-            borderColor: 'rgb(255, 255, 26)',            
+            backgroundColor: 'rgb(0, 0, 255)',
+            borderColor: 'rgb(0, 0, 255)',            
         },
         {
             label: 'Forecast #3',            
@@ -354,7 +484,7 @@
                 x:{
                     title: {
                         display: true,
-                        text: 'Delta T [°C] ',
+                        text: 'last ' + xScalelength + ' hours',
                         color: '#e8e8e8',
                         font:{
                             family: 'Anonymous Pro',
@@ -376,6 +506,7 @@
                 y: {
                     title: {
                         display: true,
+                        text: 'Delta T [°C]',
                         color: '#e8e8e8',
                         font:{
                             family: 'Anonymous Pro',
@@ -399,9 +530,13 @@
         }
     };
 
-const myChart = new Chart(document.getElementById('deltaTchart'),
+const deltaTchart = new Chart(document.getElementById('deltaTchart'),
 config  
 );
+// dark/light mode -- start    
+    changeViewMode(deltaTchart)  
+
+// dark/light mode -- end
 }
 
     function gauss_24_chart(data){   
@@ -417,8 +552,8 @@ config
         {
             label: 'Forecast #2',            
             data: data.f2_gauss,
-            backgroundColor: 'rgb(255, 255, 26)',
-            borderColor: 'rgb(255, 255, 26)',
+            backgroundColor: 'rgb(0, 0, 255)',
+            borderColor: 'rgb(0, 0, 255)',
             showLine: true,
             tension: 0.4,
         },
@@ -451,7 +586,7 @@ config
                     type: 'linear',
                     title: {
                         display: true,
-                        text: 'Delta T [°C] ',
+                        text: 'Delta T [°C]',
                         color: '#e8e8e8',
                         font:{
                             family: 'Anonymous Pro',
@@ -495,37 +630,55 @@ config
 
         }
     };
+    const Histogram = new Chart(document.getElementById('gauss24Chart'),
+    config
+    );
+// dark/light mode -- start    
+    changeViewMode(Histogram)  
 
-const myChart = new Chart(document.getElementById('gauss24Chart'),
-config  
-);
+// dark/light mode -- end
+
 }
-
-</script>
-<script>
-    let lightMode = 1 // 1 = dark; 0 = light
+    // CSS light mode
+    let lightMode = checkMode()
+    
     const bulb = document.querySelector('#bulb')
     const articleDiv = document.querySelectorAll('.chart-box')
-     
+
+    function darkModeCSS(articleDiv){
+        document.body.style.backgroundColor = 'rgb(26, 26, 26)';
+        document.body.style.color = 'white'
+        for(var i = 0; i < articleDiv.length; i++){
+            articleDiv[i].classList.remove('lm')
+        }
+    }
+    function lightModeCSS(articleDiv){
+        document.body.style.backgroundColor = 'white';
+        document.body.style.color = 'black'
+        for(var i = 0; i < articleDiv.length; i++){
+            articleDiv[i].classList.add('lm')            
+        }
+    }
+
+    if(lightMode === 1){        
+        darkModeCSS(articleDiv)             
+    }else{
+        lightModeCSS(articleDiv)        
+    }
+       
     bulb.addEventListener('click', function(){
         if(lightMode === 1){
-            // document.body.style.backgroundColor = 'rgb(189, 190, 186)';
-            document.body.style.backgroundColor = 'white';
-            document.body.style.color = 'black'
-            for(var i = 0; i < articleDiv.length; i++){
-                articleDiv[i].classList.add('lm')            
-            }
+            lightModeCSS(articleDiv)
             lightMode = 0
+            localStorage.setItem('l-mode', lightMode)
             
         }else{
-            document.body.style.backgroundColor = 'rgb(26, 26, 26)';
-            document.body.style.color = 'white'
-            for(var i = 0; i < articleDiv.length; i++){
-                articleDiv[i].classList.remove('lm')
-            }
+            darkModeCSS(articleDiv)
             lightMode = 1
+            localStorage.setItem('l-mode', lightMode)
         }
     })    
+
 </script>
 
 {% endblock %}

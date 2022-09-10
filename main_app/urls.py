@@ -7,7 +7,7 @@ from .views import *
 urlpatterns = [
 
     path('', HomePage, name='home-page'),
-    path('elo', chartXscale, name='chart-x-scale'),
+    path('api/chart', chartXscale, name='chart-x-scale'),
 
 
 
