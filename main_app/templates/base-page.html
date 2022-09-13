@@ -11,6 +11,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@1.1"></script>
+
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,13 +40,74 @@
         const csrftoken = getToken('csrftoken');
     </script>
 
+    <script>
+        function checkMode(){
+        let lMode = localStorage.getItem('l-mode')
+        let lightMode 
+
+        if(lMode === null){
+            lightMode = 1 // 1 = dark; 0 = light
+        }else{
+            lightMode = parseInt(lMode)
+        }
+        
+        return lightMode
+    }
+
+    function darkModeChart(Chart){
+        Chart.config.options.plugins.legend.labels.color = '#e8e8e8'
+        Chart.config.options.scales.x.title.color = '#e8e8e8'
+        Chart.config.options.scales.x.grid.color = '#e8e8e8'
+        Chart.config.options.scales.x.ticks.color = '#e8e8e8'
+        Chart.config.options.scales.y.title.color = '#e8e8e8'
+        Chart.config.options.scales.y.grid.color = '#e8e8e8'
+        Chart.config.options.scales.y.ticks.color = '#e8e8e8'
+        Chart.update()
+    }
+
+    function lightModeChart(Chart){
+        Chart.config.options.plugins.legend.labels.color = 'black'
+        Chart.config.options.scales.x.title.color = 'black'
+        Chart.config.options.scales.x.grid.color = 'black'
+        Chart.config.options.scales.x.ticks.color = 'black'
+        Chart.config.options.scales.y.title.color = 'black'
+        Chart.config.options.scales.y.grid.color = 'black'
+        Chart.config.options.scales.y.ticks.color = 'black'
+        Chart.update()
+    }
+
+    function changeViewMode(Chart){
+        let lightMode = checkMode()
+        const bulb = document.querySelector('#bulb')    
+
+        if(lightMode === 1){
+            darkModeChart(Chart)                             
+        }else{
+            lightModeChart(Chart)     
+        }
+        
+        bulb.addEventListener('click', function(){
+            if(lightMode === 1){
+                lightModeChart(Chart)
+                lightMode = 0
+                localStorage.setItem('l-mode', lightMode)            
+            }else{
+                darkModeChart(Chart)
+                lightMode = 1
+                localStorage.setItem('l-mode', lightMode)
+            }
+        })
+    }
+       
+    </script>
+
 </head>
 <body>
     <nav>
         <div>
             <ul>
-                <li><a href="#">Home Page</a></li>
-                <li><a href="#">About</a></li>
+                <li><a href="{% url 'home-page' %}">Home Page</a></li>
+                <li><a href="{% url 'historical-' %}">Historical data</a></li>
                 <li><a href="#">Contact</a></li>
             </ul>
         </div>
@@ -51,7 +115,7 @@
             <ul>
                 <li><a class="chart-range" title="1">1 day</a></li>
                 <li><a class="chart-range" title="3">3 days</a></li>
-                <li><a class="chart-range" title="5">5 days</a></li>
+                <li><a class="chart-range" title="7">7 days</a></li>
             </ul>  
         </div>
         <div>
@@ -66,13 +130,51 @@
     {% block charts %}
     {% endblock %}
 
+    <script>
+        // CSS light mode
+        let lightMode = checkMode()
+        
+        const bulb = document.querySelector('#bulb')
+        const articleDiv = document.querySelectorAll('.chart-box')
 
+        function darkModeCSS(articleDiv){
+            document.body.style.backgroundColor = 'rgb(26, 26, 26)';
+            document.body.style.color = 'white'
+            for(var i = 0; i < articleDiv.length; i++){
+                articleDiv[i].classList.remove('lm')
+            }
+        }
+        function lightModeCSS(articleDiv){
+            document.body.style.backgroundColor = 'white';
+            document.body.style.color = 'black'
+            for(var i = 0; i < articleDiv.length; i++){
+                articleDiv[i].classList.add('lm')            
+            }
+        }
+
+        if(lightMode === 1){        
+            darkModeCSS(articleDiv)             
+        }else{
+            lightModeCSS(articleDiv)        
+        }
+        
+        bulb.addEventListener('click', function(){
+            if(lightMode === 1){
+                lightModeCSS(articleDiv)
+                lightMode = 0
+                localStorage.setItem('l-mode', lightMode)
+                
+            }else{
+                darkModeCSS(articleDiv)
+                lightMode = 1
+                localStorage.setItem('l-mode', lightMode)
+            }
+        })
+    </script>
     {% block scripts %}
     {% endblock %}
 
-    <script>
-
-        
+    <script>        
         const chartRange = document.querySelectorAll('.chart-range')
 
         for(let i = 0; i < chartRange.length; i++){

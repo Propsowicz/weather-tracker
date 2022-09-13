@@ -1,0 +1,376 @@
+{% extends 'base-page.html' %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" href="{% static 'css/.css' %}">
+
+
+    
+
+</head>
+<body>
+
+
+    {% block charts %}
+    <article>  
+        <div class="station-select-nav">
+            <label style="color: black;">Stacja badawcza:</label>
+            <!-- <input list="stations-list">  -->
+            <select id="stations-list">            
+            </select>
+        </div>
+    </article>
+    <main>
+        <div class="main-charts">
+            <div class="chart-box">
+                <h2>Temperature - <span class="station-name"></span></h2>
+                <div class="temp-chart">
+                    <div class="chart">
+                        <canvas id="tempChart"></canvas>
+                    </div>                
+                    <div class="chart-info">
+                        <div class="inside-chart-info">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>  
+            <div class="chart-box">
+                <h2>Pearson correlation - <span class="station-name"></span></h2>
+                <div class="wind-chart">                               
+                    <div class="chart-info">
+                        <div class="inside-chart-info">
+                                                  
+                        </div>    
+                    </div>
+                    <div class="chart">
+                        <canvas id="matrixChart"></canvas>
+                    </div> 
+                </div>
+            </div>
+            <br><br><br><br><br><br><br><br>
+            <p>Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki Wodnej – Państwowy Instytut Badawczy.</p>
+            <p>Dane Instytutu Meteorologii i Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone.</p>
+    </main>
+    
+    {% endblock %}
+
+
+    {% block scripts %}
+    <script>
+        const navBtns = document.querySelectorAll('.chart-range')
+        for(let i = 0; navBtns.length; i++){
+            navBtns[i].style.visibility = 'hidden'
+        }
+
+        function darkModeMatrixChart(Chart){                
+                Chart.config.options.scales.x.ticks.color = '#e8e8e8'                
+                Chart.config.options.scales.y.ticks.color = '#e8e8e8'
+                Chart.update()
+            }
+
+            function lightModeMatrixChart(Chart){                
+                Chart.config.options.scales.x.ticks.color = 'black'                
+                Chart.config.options.scales.y.ticks.color = 'black'
+                Chart.update()
+            }
+
+            function changeViewMatrixMode(Chart){
+                let lightMode = checkMode()
+                const bulb = document.querySelector('#bulb')    
+
+                if(lightMode === 1){
+                    darkModeMatrixChart(Chart)                             
+                }else{
+                    lightModeMatrixChart(Chart)     
+                }
+                
+                bulb.addEventListener('click', function(){
+                    if(lightMode === 1){
+                        lightModeMatrixChart(Chart)
+                        lightMode = 0
+                        localStorage.setItem('l-mode', lightMode)            
+                    }else{
+                        darkModeMatrixChart(Chart)
+                        lightMode = 1
+                        localStorage.setItem('l-mode', lightMode)
+                    }
+                })
+            }
+    </script>
+
+    <script>
+    var endpoint = '/api/hist/data'
+    $.ajax({
+        method: 'GET',
+        url: endpoint,
+        success: function(data){
+            console.log(data)
+            
+
+            temp_chart(data.data)
+            matrix_chart(data.PearsonCorr)
+
+            // creating stations selector
+            const selectorDiv = document.querySelector('#stations-list')
+            const stations_list = data.stations_list
+
+            for(let i = 0; i < stations_list.length; i++){
+                let opt = document.createElement('option')
+                opt.value = stations_list[i]
+                opt.innerText = stations_list[i]
+                if(stations_list[i] === data.station_name){
+                    opt.selected = true
+                }
+                selectorDiv.appendChild(opt)
+            }
+
+
+            const stationNameSpan = document.querySelectorAll('.station-name')
+            for(let i = 0; stationNameSpan.length; i++){
+                stationNameSpan[i].innerText = data.station_name
+            }
+        },  
+        error: function(data){
+            console.log('error')
+        }
+        })
+
+
+    function temp_chart(data){
+       
+    const labels = data.date;
+    const Tmax = data.Tmax;
+    const Tmean = data.Tmean;
+    const Tmin = data.Tmin;
+    const Tsoil = data.Tsoil;
+
+
+    const chart_data = {
+        labels: labels,
+        datasets: [{
+            label: 'Max temperature',
+            backgroundColor: 'rgb(255, 0, 0)',
+            borderColor: 'rgb(255, 0, 0)',
+            data: Tmax,
+            },
+            {
+            label: 'Mean temperature',
+            backgroundColor: 'rgb(255, 0, 255)',
+            borderColor: 'rgb(255, 0, 255)',
+            data: Tmean,
+            }, 
+            {
+            label: 'Min temperature',
+            backgroundColor: 'rgb(255, 255, 0)',
+            borderColor: 'rgb(255, 255, 0)',
+            data: Tmin,
+            }, 
+            {
+            label: 'Soil temperature',
+            backgroundColor: 'rgb(0, 0, 255)',
+            borderColor: 'rgb(0, 0, 255)',
+            data: Tsoil,
+            },         
+        ]
+    };
+
+    const config = {
+        type: 'line',
+        data: chart_data,
+        options: {
+            animation: false,
+            elements:{
+                point:{
+                    radius: 0
+                }
+            },
+            plugins: {
+                legend: {
+                    labels:{
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                },
+            },
+            scales:{
+                x:{
+                    title: {
+                        display: true,
+                        text: 'last hours',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'temperature [°C]',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                                    
+            },
+
+            }
+        };
+
+        const tempChart = new Chart(document.getElementById('tempChart'),
+        config  
+        );
+
+        // dark/light mode -- start    
+            changeViewMode(tempChart)  
+
+        // dark/light mode -- end
+        }
+
+
+    function matrix_chart(data){
+          
+       const chart_data = {
+        datasets: [{
+            label: 'Matrix',
+            data: data,            
+            backgroundColor(context) {
+            const value = context.dataset.data[context.dataIndex].v;
+            const alpha = 255 - Math.abs(value * 255);
+            return `rgb(10, ${alpha}, 255)`;
+            },
+            
+            borderWidth: 1,
+            width: ({chart}) => (chart.chartArea || {}).width / 7 - 1,
+            height: ({chart}) =>(chart.chartArea || {}).height / 7 - 1
+            }]
+            };
+   
+            const config = {
+                type: 'matrix',
+                data: chart_data,
+                options: {
+                    plugins: {
+                    legend: false,
+                    tooltip: {
+                        callbacks: {
+                        title() {
+                            return '';
+                        },
+                        label(context) {
+                            const v = context.dataset.data[context.dataIndex];
+                            return ['x: ' + v.x, 'y: ' + v.y, 'correlation: ' + v.v];
+                        }
+                        }
+                    }
+                    },
+                    scales: {
+                    x: {
+                        type: 'category',
+                        labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
+                        ticks: {
+                            display: true,
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                        },
+                        },
+                        grid: {
+                        display: false
+                        }
+                    },
+                    y: {
+                        type: 'category',
+                        labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
+                        offset: true,
+                        ticks: {
+                            display: true,
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                        },
+                        },
+                        grid: {
+                        display: false
+                        }
+                    }
+                    }
+                }
+            };
+                
+           const matrixChart = new Chart(document.getElementById('matrixChart'),
+           config  
+           );           
+
+           // dark/light mode -- start    
+               changeViewMatrixMode(matrixChart)  
+   
+           // dark/light mode -- end
+           }
+
+
+        const selected_station = document.getElementById('stations-list')
+
+        selected_station.addEventListener('change', () => {
+            const station_name = selected_station.value
+            select_station(station_name)
+        })
+
+        function select_station(station_name){
+            const url =  "{% url 'select-station' %}"
+            fetch(url, {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body:JSON.stringify({
+                    'station_name': station_name,                    
+                })
+            })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                location.reload()
+            })
+    }
+         
+
+    </script>
+    {% endblock %}
+
+</body>
+</html>

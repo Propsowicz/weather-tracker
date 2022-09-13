@@ -1,6 +1,8 @@
 from django.db import models
 
 # Create your models here.
+from django.utils.text import slugify
+
 
 class DailyMeasurement(models.Model):
     date = models.DateField()
@@ -59,3 +61,32 @@ class AlertMsg(models.Model):
     def __str__(self):
         return str(self.day)
 
+class WeatherStation(models.Model):
+    station_id = models.CharField(max_length=50)
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=110)
+
+    def save(self, *args, **kwargs):
+        super(WeatherStation, self).save(*args, **kwargs)
+        if not self.slug:
+            self.slug = slugify(self.name)
+            self.save()
+
+    def __str__(self):
+        return  f'{self.station_id}: {self.name}'
+
+class StationsMeasurement(models.Model):
+    station = models.ForeignKey(WeatherStation, on_delete=models.CASCADE)
+
+    date = models.DateField()
+    Tmin = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
+    Tmax = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
+    Tmean = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
+    Tsoil = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
+    Humidity = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    Wind = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    Overcast = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+
+
+    def __str__(self):
+        return f'{self.station}: {self.date}'

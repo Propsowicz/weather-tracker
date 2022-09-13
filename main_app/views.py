@@ -1,13 +1,23 @@
+import csv
 import json
 import os
 
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
+# from django.templatetags.static import static
+
 from .models import *
 # Create your views here.
 import requests
 from .utils import *
 from datetime import datetime, date
+from .csvLoader import importCSVtoDB, importCSVtoDB_t
+import numpy as np
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -23,12 +33,64 @@ def HomePage(request):
 
     return render(request, 'home-page.html', context)
 
+def HistoricalData(request):
 
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
 
-class ListUsers(APIView):
+    context = {
+    }
+
+    return render(request, 'historical-data.html', context)
+
+
+@login_required
+def csvLoader(request):
+    months = ['01','02','03','04','05','06','07','08','09','10','11','12']
+
+    # script to add csv files to DB (format w/o _t_)
+    # for i in months:
+    #     importCSVtoDB(f'k_d_{i}_2021.csv', WeatherStation, StationsMeasurement)
+
+    # script to add csv files to DB (format with _t_)
+    # for i in months:
+    #     importCSVtoDB_t(f'k_d_t_{i}_2019.csv', WeatherStation, StationsMeasurement)
+
+    return  render(request, 'csvLoader.html', {})
+
+
+
+
+class WeatherHist(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+
+        if request.session.get('station_name'):
+            station_name = request.session.get('station_name')
+        else:
+            station_name = 'PSZCZYNA'
+        # station_name = 'BORUCINO'
+        # arrgrhrhrhr
+
+        hist_data = historical_data(WeatherStation, StationsMeasurement)
+        stations_list = list(hist_data.keys())
+        hist_data_selected = hist_data[station_name]
+
+
+        data = {
+            'PearsonCorr': PearsonCorr(hist_data_selected),
+            'station_name': station_name,
+            'data': hist_data_selected,
+            'stations_list': stations_list,
+
+        }
+
+        return Response(data)
+
+
+
+class WeatherLive(APIView):
     authentication_classes = []
     permission_classes = []
 
@@ -81,7 +143,12 @@ class ListUsers(APIView):
 
 def chartXscale(request):
     days_to_render = json.loads(request.body)
-
     request.session['days_to_render'] = days_to_render
+
+    return JsonResponse('cart is completed', safe=False)
+
+def selectStation(request):
+    station_name = json.loads(request.body)
+    request.session['station_name'] = station_name['station_name']
 
     return JsonResponse('cart is completed', safe=False)

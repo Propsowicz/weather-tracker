@@ -19,7 +19,7 @@
 
         <div class="main-charts">
             <div class="chart-box">
-                <h2>Temperature - Kielce</h2>
+                <h2>Temperature - KIELCE</h2>
                 <div class="temp-chart">
                     <div class="chart">
                         <canvas id="tempChart"></canvas>
@@ -40,7 +40,7 @@
                 </div>
             </div>  
             <div class="chart-box">
-                <h2>Wind speed - Kielce</h2>
+                <h2>Wind speed - KIELCE</h2>
                 <div class="wind-chart">                               
                     <div class="chart-info">
                         <div class="inside-chart-info">
@@ -158,63 +158,63 @@
         }
     })
 
-    function checkMode(){
-        let lMode = localStorage.getItem('l-mode')
-        let lightMode 
+    // function checkMode(){
+    //     let lMode = localStorage.getItem('l-mode')
+    //     let lightMode 
 
-        if(lMode === null){
-            lightMode = 1 // 1 = dark; 0 = light
-        }else{
-            lightMode = parseInt(lMode)
-        }
+    //     if(lMode === null){
+    //         lightMode = 1 // 1 = dark; 0 = light
+    //     }else{
+    //         lightMode = parseInt(lMode)
+    //     }
         
-        return lightMode
-    }
+    //     return lightMode
+    // }
 
-    function darkModeChart(Chart){
-        Chart.config.options.plugins.legend.labels.color = '#e8e8e8'
-        Chart.config.options.scales.x.title.color = '#e8e8e8'
-        Chart.config.options.scales.x.grid.color = '#e8e8e8'
-        Chart.config.options.scales.x.ticks.color = '#e8e8e8'
-        Chart.config.options.scales.y.title.color = '#e8e8e8'
-        Chart.config.options.scales.y.grid.color = '#e8e8e8'
-        Chart.config.options.scales.y.ticks.color = '#e8e8e8'
-        Chart.update()
-    }
+    // function darkModeChart(Chart){
+    //     Chart.config.options.plugins.legend.labels.color = '#e8e8e8'
+    //     Chart.config.options.scales.x.title.color = '#e8e8e8'
+    //     Chart.config.options.scales.x.grid.color = '#e8e8e8'
+    //     Chart.config.options.scales.x.ticks.color = '#e8e8e8'
+    //     Chart.config.options.scales.y.title.color = '#e8e8e8'
+    //     Chart.config.options.scales.y.grid.color = '#e8e8e8'
+    //     Chart.config.options.scales.y.ticks.color = '#e8e8e8'
+    //     Chart.update()
+    // }
 
-    function lightModeChart(Chart){
-        Chart.config.options.plugins.legend.labels.color = 'black'
-        Chart.config.options.scales.x.title.color = 'black'
-        Chart.config.options.scales.x.grid.color = 'black'
-        Chart.config.options.scales.x.ticks.color = 'black'
-        Chart.config.options.scales.y.title.color = 'black'
-        Chart.config.options.scales.y.grid.color = 'black'
-        Chart.config.options.scales.y.ticks.color = 'black'
-        Chart.update()
-    }
+    // function lightModeChart(Chart){
+    //     Chart.config.options.plugins.legend.labels.color = 'black'
+    //     Chart.config.options.scales.x.title.color = 'black'
+    //     Chart.config.options.scales.x.grid.color = 'black'
+    //     Chart.config.options.scales.x.ticks.color = 'black'
+    //     Chart.config.options.scales.y.title.color = 'black'
+    //     Chart.config.options.scales.y.grid.color = 'black'
+    //     Chart.config.options.scales.y.ticks.color = 'black'
+    //     Chart.update()
+    // }
 
-    function changeViewMode(Chart){
-        let lightMode = checkMode()
-        const bulb = document.querySelector('#bulb')    
+    // function changeViewMode(Chart){
+    //     let lightMode = checkMode()
+    //     const bulb = document.querySelector('#bulb')    
 
-        if(lightMode === 1){
-            darkModeChart(Chart)                             
-        }else{
-            lightModeChart(Chart)     
-        }
+    //     if(lightMode === 1){
+    //         darkModeChart(Chart)                             
+    //     }else{
+    //         lightModeChart(Chart)     
+    //     }
         
-        bulb.addEventListener('click', function(){
-            if(lightMode === 1){
-                lightModeChart(Chart)
-                lightMode = 0
-                localStorage.setItem('l-mode', lightMode)            
-            }else{
-                darkModeChart(Chart)
-                lightMode = 1
-                localStorage.setItem('l-mode', lightMode)
-            }
-        })
-    }
+    //     bulb.addEventListener('click', function(){
+    //         if(lightMode === 1){
+    //             lightModeChart(Chart)
+    //             lightMode = 0
+    //             localStorage.setItem('l-mode', lightMode)            
+    //         }else{
+    //             darkModeChart(Chart)
+    //             lightMode = 1
+    //             localStorage.setItem('l-mode', lightMode)
+    //         }
+    //     })
+    // }
     
     function temp_chart(data, xScalelength){
 
@@ -639,45 +639,45 @@ config
 // dark/light mode -- end
 
 }
-    // CSS light mode
-    let lightMode = checkMode()
+    // // CSS light mode
+    // let lightMode = checkMode()
     
-    const bulb = document.querySelector('#bulb')
-    const articleDiv = document.querySelectorAll('.chart-box')
+    // const bulb = document.querySelector('#bulb')
+    // const articleDiv = document.querySelectorAll('.chart-box')
 
-    function darkModeCSS(articleDiv){
-        document.body.style.backgroundColor = 'rgb(26, 26, 26)';
-        document.body.style.color = 'white'
-        for(var i = 0; i < articleDiv.length; i++){
-            articleDiv[i].classList.remove('lm')
-        }
-    }
-    function lightModeCSS(articleDiv){
-        document.body.style.backgroundColor = 'white';
-        document.body.style.color = 'black'
-        for(var i = 0; i < articleDiv.length; i++){
-            articleDiv[i].classList.add('lm')            
-        }
-    }
+    // function darkModeCSS(articleDiv){
+    //     document.body.style.backgroundColor = 'rgb(26, 26, 26)';
+    //     document.body.style.color = 'white'
+    //     for(var i = 0; i < articleDiv.length; i++){
+    //         articleDiv[i].classList.remove('lm')
+    //     }
+    // }
+    // function lightModeCSS(articleDiv){
+    //     document.body.style.backgroundColor = 'white';
+    //     document.body.style.color = 'black'
+    //     for(var i = 0; i < articleDiv.length; i++){
+    //         articleDiv[i].classList.add('lm')            
+    //     }
+    // }
 
-    if(lightMode === 1){        
-        darkModeCSS(articleDiv)             
-    }else{
-        lightModeCSS(articleDiv)        
-    }
+    // if(lightMode === 1){        
+    //     darkModeCSS(articleDiv)             
+    // }else{
+    //     lightModeCSS(articleDiv)        
+    // }
        
-    bulb.addEventListener('click', function(){
-        if(lightMode === 1){
-            lightModeCSS(articleDiv)
-            lightMode = 0
-            localStorage.setItem('l-mode', lightMode)
+    // bulb.addEventListener('click', function(){
+    //     if(lightMode === 1){
+    //         lightModeCSS(articleDiv)
+    //         lightMode = 0
+    //         localStorage.setItem('l-mode', lightMode)
             
-        }else{
-            darkModeCSS(articleDiv)
-            lightMode = 1
-            localStorage.setItem('l-mode', lightMode)
-        }
-    })    
+    //     }else{
+    //         darkModeCSS(articleDiv)
+    //         lightMode = 1
+    //         localStorage.setItem('l-mode', lightMode)
+    //     }
+    // })    
 
 </script>
 

@@ -183,7 +183,7 @@ main{
 }
 .inside-chart-info{
     /* background-color: rgb(181, 255, 108); */
-    background-color: var(--col-prm4);
+    background-color: #0084ff;
     padding: 1rem 0.3rem;
     text-align: center;
     border-radius: 1.5rem;
@@ -278,13 +278,22 @@ br{
 }
 
     /* dark/light mode -- end */
-
-
-
 /* MAIN -- end */
-
+article{
+    padding-top: 3rem;
+    background-color: var(--col-prm1);
+    
+}
+.station-select-nav{
+    width: 67.5%;
+    margin: 0 auto;
+    padding: 0.5rem;
+    position: fixed;
+}
+.station-select-nav input{
+    border: none;
+    border-radius: 0.3rem;
+}
 
 /* FOOTER -- start */
-
-
 /* FOOTER -- end */

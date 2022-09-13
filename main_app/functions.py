@@ -2,6 +2,7 @@ from datetime import date, timedelta, time, datetime
 from .models import *
 from statistics import mean, stdev
 import numpy as np
+import pandas as pd
 from sms import send_sms
 
 
@@ -171,4 +172,93 @@ def send_alert(DailyMeasurement, AlertMsg):
         )
     else:
         pass
+
+def historical_data(WeatherStation, StationsMeasurement):
+
+    data = {}
+    all_stations = WeatherStation.objects.all()
+    for station in all_stations:
+        date_list = []
+        Tmin_list = []
+        Tmax_list = []
+        Tmean_list = []
+        Tsoil_list = []
+        Humidity_list = []
+        Wind_list = []
+        Overcast_list = []
+
+        all_measurements = station.stationsmeasurement_set.all().order_by('date')
+        for day in all_measurements:
+            try:
+                date_list.append(day.date)
+                Tmin_list.append(float(day.Tmin))
+                Tmax_list.append(float(day.Tmax))
+                Tmean_list.append(float(day.Tmean))
+                Tsoil_list.append(float(day.Tsoil))
+                Humidity_list.append(float(day.Humidity))
+                Wind_list.append(float(day.Wind))
+                Overcast_list.append(float(day.Overcast))
+            except:
+                date_list.append(day.date)
+                Tmin_list.append(day.Tmin)
+                Tmax_list.append(day.Tmax)
+                Tmean_list.append(day.Tmean)
+                Tsoil_list.append(day.Tsoil)
+                Humidity_list.append(day.Humidity)
+                Wind_list.append(day.Wind)
+                Overcast_list.append(day.Overcast)
+
+            
+            # checking if weather data is for whole time period
+            if len(date_list) == 1096:
+                data[station.name] = {
+                    'date': date_list,
+                    'Tmin': Tmin_list,
+                    'Tmax': Tmax_list,
+                    'Tmean': Tmean_list,
+                    'Tsoil': Tsoil_list,
+                    'Humidity': Humidity_list,
+                    'Wind': Wind_list,
+                    'Overcast': Overcast_list,
+                }
+            else:
+                pass
+
+    return data
+
+def PearsonCorr(data_dict):
+    df = pd.DataFrame.from_dict(data_dict)
+    Pcorr = df.corr()
+    # print(Pcorr)
+
+    i = 0
+    matrix_list = []
+    for y_scale in Pcorr:
+        for x_scale, val in zip(Pcorr, np.array(Pcorr)[i]):
+            if np.isnan(val):
+                matrix_list.append({'x': x_scale, 'y':y_scale, 'v':0})
+            else:
+                matrix_list.append({'x': x_scale, 'y':y_scale, 'v':val})
+        i += 1
+    return matrix_list
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
