@@ -294,6 +294,40 @@ article{
     border: none;
     border-radius: 0.3rem;
 }
+/* CONTACT -- start */
+.contact-msg-area{
+    width: 100%;
+    height: 15rem;
+    resize: none;
+    padding: 0.4rem;
+}
+
+.msg{
+    padding: 1rem 0;
+}
+.msg input, .msg label{
+    display: block;
+    width: 100%;
+}
+.msg input{
+    padding: 0.4rem;
+}
+.contact-btn{
+    float: right;
+    border: 1px solid gray;
+    border-radius: 0.3rem;
+    background-color: var(--col-prm1);
+}
+.contact-btn:hover{
+    cursor: pointer;
+    font-weight: 700;
+}
+
+
+
+
+/* CONTACT -- end */
+
 
 /* FOOTER -- start */
 /* FOOTER -- end */

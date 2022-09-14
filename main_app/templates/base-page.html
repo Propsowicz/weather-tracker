@@ -41,7 +41,7 @@
     </script>
 
     <script>
-        function checkMode(){
+    function checkMode(){
         let lMode = localStorage.getItem('l-mode')
         let lightMode 
 
@@ -107,8 +107,8 @@
         <div>
             <ul>
                 <li><a href="{% url 'home-page' %}">Home Page</a></li>
-                <li><a href="{% url 'historical-' %}">Historical data</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="{% url 'historical' %}">Historical data</a></li>
+                <li><a href="{% url 'contact' %}">Contact</a></li>
             </ul>
         </div>
         <div>

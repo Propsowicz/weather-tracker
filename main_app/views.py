@@ -33,6 +33,13 @@ def HomePage(request):
 
     return render(request, 'home-page.html', context)
 
+def Contact(request):
+
+    context = {
+
+    }
+    return render(request, 'contact.html', context)
+
 def HistoricalData(request):
 
 
@@ -76,14 +83,22 @@ class WeatherHist(APIView):
         hist_data = historical_data(WeatherStation, StationsMeasurement)
         stations_list = list(hist_data.keys())
         hist_data_selected = hist_data[station_name]
-
+        extreme_values = {
+            'Tmax':         max(hist_data_selected['Tmax']),
+            'Tmin':         min(hist_data_selected['Tmin']),
+            'Tsoil_max':    max(hist_data_selected['Tsoil']),
+            'Tsoil_min':    min(hist_data_selected['Tsoil']),
+            'Hum_max':      max(hist_data_selected['Humidity']),
+            'Hum_min':      min(hist_data_selected['Humidity']),
+            'Wind_max':     max(hist_data_selected['Wind']),
+        }
 
         data = {
             'PearsonCorr': PearsonCorr(hist_data_selected),
             'station_name': station_name,
             'data': hist_data_selected,
             'stations_list': stations_list,
-
+            'extreme_values': extreme_values,
         }
 
         return Response(data)

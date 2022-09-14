@@ -19,7 +19,7 @@
     {% block charts %}
     <article>  
         <div class="station-select-nav">
-            <label style="color: black;">Stacja badawcza:</label>
+            <label style="color: black;">Weather station:</label>
             <!-- <input list="stations-list">  -->
             <select id="stations-list">            
             </select>
@@ -35,24 +35,89 @@
                     </div>                
                     <div class="chart-info">
                         <div class="inside-chart-info">
-                            
+                            <br><br><br><br><br>
+                            <p>This plot shows changes in temperature in certain period of time.</p><br><br><br><br>
+                            <p>Chart lines represent max, min and mean temperature for every of analyzed days. </p><br><br><br><br>
+                            <p>Tsoil represents temperature of ground.</p>
                         </div>
                     </div>
                 </div>
             </div>  
             <div class="chart-box">
-                <h2>Pearson correlation - <span class="station-name"></span></h2>
+                <h2>Humidity - <span class="station-name"></span></h2>
                 <div class="wind-chart">                               
                     <div class="chart-info">
                         <div class="inside-chart-info">
-                                                  
+                            <br><br><br><br><br><br><br><br>
+                            <p>Chart presents the amount of water vapor in the air.</p><br><br><br>
+                            <p>Humidity is measured in %, where 100% means that air rises the saturation point.</p>
                         </div>    
                     </div>
                     <div class="chart">
-                        <canvas id="matrixChart"></canvas>
+                        <canvas id="humidityChart"></canvas>
                     </div> 
                 </div>
             </div>
+
+
+            <div class="main-charts">
+                <div class="chart-box">
+                    <h2>Wind speed - <span class="station-name"></span></h2>
+                    <div class="temp-chart">
+                        <div class="chart">
+                            <canvas id="windChart"></canvas>
+                        </div>                
+                        <div class="chart-info">
+                            <div class="inside-chart-info">
+                                <br><br><br><br><br>
+                                <p>This plot shows avarege speed of wind measured in meters per second.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>  
+                <div class="chart-box">
+                    <h2>Overcast clouds - <span class="station-name"></span></h2>
+                    <div class="wind-chart">                               
+                        <div class="chart-info">
+                            <div class="inside-chart-info">
+                                <br><br><br><br><br>
+                                <p>Chart shows overcast cloud measured in oktas. Okta is unit of measurement in 8 level scale:</p><br><br>
+                                <p>0 - sky is clear</p><br><br>
+                                <p>1,2 - few clouds</p><br><br>
+                                <p>3,4 - scattered</p><br><br>
+                                <p>5,7 - broken</p><br><br>
+                                <p>8 - overcast</p>                                                                                                   
+                            </div>    
+                        </div>
+                        <div class="chart">
+                            <canvas id="overcastChart"></canvas>
+                        </div> 
+                    </div>
+                </div>
+                
+                <div class="main-charts">
+                    
+                    <div class="chart-box">
+                        <h2>Pearson correlation - <span class="station-name"></span></h2>
+                        <div class="temp-chart">
+                            <div class="chart">
+                                <canvas id="matrixChart"></canvas>
+                            </div>                
+                            <div class="chart-info">
+                                <div class="inside-chart-info">
+                                    <br><br><br><br><br>
+                                    <p>This chart shows Pearson correlation between all measured data. Correlation stands between -1 to 1, where 0 means no correlation at all, 1 means there is linear correlations between data, and -1 means that linear correlation is inversed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    
+
+
+
+
             <br><br><br><br><br><br><br><br>
             <p>Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki Wodnej – Państwowy Instytut Badawczy.</p>
             <p>Dane Instytutu Meteorologii i Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone.</p>
@@ -114,6 +179,9 @@
             
 
             temp_chart(data.data)
+            humidity_chart(data.data)
+            wind_chart(data.data)
+            overcast_chart(data.data)
             matrix_chart(data.PearsonCorr)
 
             // creating stations selector
@@ -204,7 +272,7 @@
                 x:{
                     title: {
                         display: true,
-                        text: 'last hours',
+                        text: 'days',
                         color: '#e8e8e8',
                         font:{
                             family: 'Anonymous Pro',
@@ -249,96 +317,385 @@
             }
         };
 
-        const tempChart = new Chart(document.getElementById('tempChart'),
+    const tempChart = new Chart(document.getElementById('tempChart'),
+    config  
+    );
+
+    // dark/light mode -- start    
+    changeViewMode(tempChart)  
+    // dark/light mode -- end
+    }
+
+
+    function wind_chart(data){        
+    const labels = data.date;
+    const wind = data.Wind;
+
+    const chart_data = {
+    labels: labels,
+    datasets: [{
+        label: 'Wind speed',
+        backgroundColor: 'rgb(0, 0, 255)',
+        borderColor: 'rgb(0, 0, 255)',
+        data: wind,
+        },
+                
+    ]
+    };
+
+    const config = {
+        type: 'line',
+        data: chart_data,
+        options: {
+            animation: false,
+            elements:{
+                point:{
+                    radius: 0
+                }
+            },
+            plugins: {
+                legend: {
+                    labels:{
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                },
+            },
+            scales:{
+                x:{
+                    title: {
+                        display: true,
+                        text: 'days',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'wind speed [m/s]',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                                    
+            },
+
+            }
+        };
+
+        const windChart = new Chart(document.getElementById('windChart'),
         config  
         );
 
         // dark/light mode -- start    
-            changeViewMode(tempChart)  
+        changeViewMode(windChart)  
+        // dark/light mode -- end
+        }
 
+
+
+
+
+
+    function overcast_chart(data){        
+    const labels = data.date;
+    const wind = data.Overcast;
+
+        const chart_data = {
+        labels: labels,
+        datasets: [{
+            label: 'Overcast',
+            backgroundColor: 'rgb(0, 0, 255)',
+            borderColor: 'rgb(0, 0, 255)',
+            data: wind,
+            },
+                    
+        ]
+    };
+
+    const config = {
+        type: 'bar',
+        data: chart_data,
+        options: {
+            animation: false,
+            elements:{
+                point:{
+                    radius: 0
+                }
+            },
+            plugins: {
+                legend: {
+                    labels:{
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                },
+            },
+            scales:{
+                x:{
+                    title: {
+                        display: true,
+                        text: 'days',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'oktas',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                                    
+            },
+
+            }
+        };
+
+        const overcastChart = new Chart(document.getElementById('overcastChart'),
+        config  
+        );
+
+        // dark/light mode -- start    
+        changeViewMode(overcastChart)  
+
+        // dark/light mode -- end
+        }
+
+        function humidity_chart(data){
+        
+    const labels = data.date;
+    const wind = data.Humidity;
+
+
+        const chart_data = {
+        labels: labels,
+        datasets: [{
+            label: 'Humidity',
+            backgroundColor: 'rgb(0, 0, 255)',
+            borderColor: 'rgb(0, 0, 255)',
+            data: wind,
+            },
+                    
+        ]
+    };
+
+    const config = {
+        type: 'bar',
+        data: chart_data,
+        options: {
+            animation: false,
+            elements:{
+                point:{
+                    radius: 0
+                }
+            },
+            plugins: {
+                legend: {
+                    labels:{
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                },
+            },
+            scales:{
+                x:{
+                    title: {
+                        display: true,
+                        text: 'days',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'humidity [%]',
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    },
+                    grid: {
+                        color: '#e8e8e8',
+                        borderWidth: 1,
+                        lineWidth: 0.2,
+                    },
+                    ticks: {
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                        }, 
+                    }
+                },
+                                    
+            },
+
+            }
+        };
+
+        const humidityChart = new Chart(document.getElementById('humidityChart'),
+        config  
+        );
+
+        // dark/light mode -- start    
+        changeViewMode(humidityChart)  
         // dark/light mode -- end
         }
 
 
     function matrix_chart(data){
-          
-       const chart_data = {
-        datasets: [{
-            label: 'Matrix',
-            data: data,            
-            backgroundColor(context) {
-            const value = context.dataset.data[context.dataIndex].v;
-            const alpha = 255 - Math.abs(value * 255);
-            return `rgb(10, ${alpha}, 255)`;
-            },
             
-            borderWidth: 1,
-            width: ({chart}) => (chart.chartArea || {}).width / 7 - 1,
-            height: ({chart}) =>(chart.chartArea || {}).height / 7 - 1
-            }]
-            };
-   
-            const config = {
-                type: 'matrix',
-                data: chart_data,
-                options: {
-                    plugins: {
-                    legend: false,
-                    tooltip: {
-                        callbacks: {
-                        title() {
-                            return '';
-                        },
-                        label(context) {
-                            const v = context.dataset.data[context.dataIndex];
-                            return ['x: ' + v.x, 'y: ' + v.y, 'correlation: ' + v.v];
-                        }
-                        }
-                    }
+    const chart_data = {
+    datasets: [{
+        label: 'Matrix',
+        data: data,            
+        backgroundColor(context) {
+        const value = context.dataset.data[context.dataIndex].v;
+        const alpha = 255 - Math.abs(value * 255);
+        return `rgb(10, ${alpha}, 255)`;
+        },
+        
+        borderWidth: 1,
+        width: ({chart}) => (chart.chartArea || {}).width / 7 - 1,
+        height: ({chart}) =>(chart.chartArea || {}).height / 7 - 1
+        }]
+        };
+
+        const config = {
+            type: 'matrix',
+            data: chart_data,
+            options: {
+                plugins: {
+                legend: false,
+                tooltip: {
+                    callbacks: {
+                    title() {
+                        return '';
                     },
-                    scales: {
-                    x: {
-                        type: 'category',
-                        labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
-                        ticks: {
-                            display: true,
-                            color: '#e8e8e8',
-                            font:{
-                                family: 'Anonymous Pro',
-                        },
-                        },
-                        grid: {
-                        display: false
-                        }
-                    },
-                    y: {
-                        type: 'category',
-                        labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
-                        offset: true,
-                        ticks: {
-                            display: true,
-                            color: '#e8e8e8',
-                            font:{
-                                family: 'Anonymous Pro',
-                        },
-                        },
-                        grid: {
-                        display: false
-                        }
+                    label(context) {
+                        const v = context.dataset.data[context.dataIndex];
+                        return ['x: ' + v.x, 'y: ' + v.y, 'correlation: ' + v.v];
                     }
                     }
                 }
-            };
-                
-           const matrixChart = new Chart(document.getElementById('matrixChart'),
-           config  
-           );           
+                },
+                scales: {
+                x: {
+                    type: 'category',
+                    labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
+                    ticks: {
+                        display: true,
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                    },
+                    },
+                    grid: {
+                    display: false
+                    }
+                },
+                y: {
+                    type: 'category',
+                    labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
+                    offset: true,
+                    ticks: {
+                        display: true,
+                        color: '#e8e8e8',
+                        font:{
+                            family: 'Anonymous Pro',
+                    },
+                    },
+                    grid: {
+                    display: false
+                    }
+                }
+                }
+            }
+        };
+            
+        const matrixChart = new Chart(document.getElementById('matrixChart'),
+        config  
+        );           
 
-           // dark/light mode -- start    
-               changeViewMatrixMode(matrixChart)  
-   
-           // dark/light mode -- end
-           }
+        // dark/light mode -- start    
+        changeViewMatrixMode(matrixChart)  
+        // dark/light mode -- end
+        }
 
 
         const selected_station = document.getElementById('stations-list')
