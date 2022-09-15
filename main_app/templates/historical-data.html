@@ -35,10 +35,12 @@
                     </div>                
                     <div class="chart-info">
                         <div class="inside-chart-info">
-                            <br><br><br><br><br>
-                            <p>This plot shows changes in temperature in certain period of time.</p><br><br><br><br>
-                            <p>Chart lines represent max, min and mean temperature for every of analyzed days. </p><br><br><br><br>
-                            <p>Tsoil represents temperature of ground.</p>
+                            <br>
+                            <p>This plot shows the changes in the temperature in a certain period of time. Here are the extreme values of temperature in the selected period:</p><br><br><br><br>
+                            <p>Max temp:<span id="Tmax">-</span>°C</p><br><br>
+                            <p>Min temp:<span id="Tmin">-</span>°C</p><br><br>
+                            <p>Max soil temp:<span id="Tsoil_max">-</span>°C</p><br><br>
+                            <p>Min soil temp:<span id="Tsoil_min">-</span>°C</p><br><br>
                         </div>
                     </div>
                 </div>
@@ -48,9 +50,10 @@
                 <div class="wind-chart">                               
                     <div class="chart-info">
                         <div class="inside-chart-info">
-                            <br><br><br><br><br><br><br><br>
-                            <p>Chart presents the amount of water vapor in the air.</p><br><br><br>
-                            <p>Humidity is measured in %, where 100% means that air rises the saturation point.</p>
+                            <br>
+                            <p>The chart presents the amount of water vapor in the air.</p><br><br><br>
+                            <p>Humidity is measured in %, where 100% means that the air is 100% saturated with water vapor.</p><br><br>
+                            <p>The maximum humidity in the selected period of time was <span id="Hum_max">-</span>% and the minimum value was <span id="Hum_min">-</span>%.</p>
                         </div>    
                     </div>
                     <div class="chart">
@@ -70,7 +73,8 @@
                         <div class="chart-info">
                             <div class="inside-chart-info">
                                 <br><br><br><br><br>
-                                <p>This plot shows avarege speed of wind measured in meters per second.</p>
+                                <p>This plot shows the avarege speed of wind measured in meters per second.</p><br><br><br>
+                                <p>The maximum speed of wind observed during this period of time was <span id="Wind">-</span>m/s.</p>
                             </div>
                         </div>
                     </div>
@@ -81,8 +85,8 @@
                         <div class="chart-info">
                             <div class="inside-chart-info">
                                 <br><br><br><br><br>
-                                <p>Chart shows overcast cloud measured in oktas. Okta is unit of measurement in 8 level scale:</p><br><br>
-                                <p>0 - sky is clear</p><br><br>
+                                <p>The chart shows the overcast measured in oktas. An okta is a unit of measurement on 8 level scale:</p><br><br>
+                                <p>0 - clear</p><br><br>
                                 <p>1,2 - few clouds</p><br><br>
                                 <p>3,4 - scattered</p><br><br>
                                 <p>5,7 - broken</p><br><br>
@@ -106,7 +110,7 @@
                             <div class="chart-info">
                                 <div class="inside-chart-info">
                                     <br><br><br><br><br>
-                                    <p>This chart shows Pearson correlation between all measured data. Correlation stands between -1 to 1, where 0 means no correlation at all, 1 means there is linear correlations between data, and -1 means that linear correlation is inversed.</p>
+                                    <p>This chart shows the Pearson correlation coefficient for all measured data. The coefficient can range from -1 to 1, where 0 means no linear correlation at all, 1 means there is a correlation between data, and -1 means that the correlation is inversed.</p>
                                 </div>
                             </div>
                         </div>
@@ -176,33 +180,51 @@
         url: endpoint,
         success: function(data){
             console.log(data)
+           
             
-
             temp_chart(data.data)
             humidity_chart(data.data)
             wind_chart(data.data)
             overcast_chart(data.data)
             matrix_chart(data.PearsonCorr)
 
+            // adding data to DOM txt
+            document.querySelector('#Tmax').innerText = data.extreme_values.Tmax
+            document.querySelector('#Tmin').innerText = data.extreme_values.Tmin
+            document.querySelector('#Tsoil_max').innerText = data.extreme_values.Tsoil_max
+            document.querySelector('#Tsoil_min').innerText = data.extreme_values.Tsoil_min
+            document.querySelector('#Hum_max').innerText = data.extreme_values.Hum_max
+            document.querySelector('#Hum_min').innerText = data.extreme_values.Hum_min
+            document.querySelector('#Wind').innerText = data.extreme_values.Wind_max
+
             // creating stations selector
             const selectorDiv = document.querySelector('#stations-list')
             const stations_list = data.stations_list
 
-            for(let i = 0; i < stations_list.length; i++){
+            // transform Object to Array (so i can sort it in PL)
+            const stations_listArr = Object.keys(stations_list).map(function(key){
+                return stations_list[key]
+            })
+
+            stations_listArr.sort(Intl.Collator().compare)            
+
+            for(let i = 0; i < stations_listArr.length; i++){
                 let opt = document.createElement('option')
-                opt.value = stations_list[i]
-                opt.innerText = stations_list[i]
-                if(stations_list[i] === data.station_name){
+                opt.value = stations_listArr[i]
+                opt.innerText = stations_listArr[i]
+                if(stations_listArr[i] === data.station_name){
                     opt.selected = true
                 }
                 selectorDiv.appendChild(opt)
             }
-
-
+            
             const stationNameSpan = document.querySelectorAll('.station-name')
             for(let i = 0; stationNameSpan.length; i++){
                 stationNameSpan[i].innerText = data.station_name
             }
+
+            
+            
         },  
         error: function(data){
             console.log('error')

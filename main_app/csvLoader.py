@@ -31,3 +31,19 @@ def importCSVtoDB_t(filename, StationDB, MeaseruementDB):
                 measurement_update.save()
             else:
                 pass
+
+def validation_of_stations(StationDB, MeaseruementDB):
+    measured_days = []
+    station_name = []
+    all_stations = StationDB.objects.all()
+
+    for station in all_stations:
+        measured_days.append(len(station.stationsmeasurement_set.all()))
+        station_name.append(station.name)
+
+    max_masurements = max(measured_days)
+    for i in range(len(station_name)):
+        if measured_days[i] != max_masurements:
+            StationDB.objects.get(name=station_name[i]).delete()
+
+    return 'station validated'

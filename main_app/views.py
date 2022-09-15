@@ -5,6 +5,7 @@ import os
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.core.mail import send_mail
 # from django.templatetags.static import static
 
 from .models import *
@@ -12,7 +13,7 @@ from .models import *
 import requests
 from .utils import *
 from datetime import datetime, date
-from .csvLoader import importCSVtoDB, importCSVtoDB_t
+from .csvLoader import importCSVtoDB, importCSVtoDB_t, validation_of_stations
 import numpy as np
 
 
@@ -52,20 +53,25 @@ def HistoricalData(request):
 
 @login_required
 def csvLoader(request):
-    months = ['01','02','03','04','05','06','07','08','09','10','11','12']
 
-    # script to add csv files to DB (format w/o _t_)
-    # for i in months:
-    #     importCSVtoDB(f'k_d_{i}_2021.csv', WeatherStation, StationsMeasurement)
+    if request.method == "POST":
+        if request.POST.get('submit_data'):
+            year_to_submit = request.POST.get('year_to_submit')
 
-    # script to add csv files to DB (format with _t_)
-    # for i in months:
-    #     importCSVtoDB_t(f'k_d_t_{i}_2019.csv', WeatherStation, StationsMeasurement)
+            months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+            # # script to add csv files to DB (format w/o _t_)
+            for i in months:
+                importCSVtoDB(f'k_d_{i}_{year_to_submit}.csv', WeatherStation, StationsMeasurement)
+
+            # # script to add csv files to DB (format with _t_)
+            for i in months:
+                importCSVtoDB_t(f'k_d_t_{i}_{year_to_submit}.csv', WeatherStation, StationsMeasurement)
+            validation_of_stations(WeatherStation, StationsMeasurement)
 
     return  render(request, 'csvLoader.html', {})
 
 
-
+import locale
 
 class WeatherHist(APIView):
     authentication_classes = []
@@ -76,27 +82,30 @@ class WeatherHist(APIView):
         if request.session.get('station_name'):
             station_name = request.session.get('station_name')
         else:
-            station_name = 'PSZCZYNA'
-        # station_name = 'BORUCINO'
-        # arrgrhrhrhr
+            station_name = 'BORUCINO'
 
-        hist_data = historical_data(WeatherStation, StationsMeasurement)
-        stations_list = list(hist_data.keys())
-        hist_data_selected = hist_data[station_name]
+        hist_data = historical_data(WeatherStation, StationsMeasurement, station_name)
+
+        stations_list = []
+        all_stations = WeatherStation.objects.all()
+        for i in all_stations:
+            stations_list.append(i.name)
+
+
         extreme_values = {
-            'Tmax':         max(hist_data_selected['Tmax']),
-            'Tmin':         min(hist_data_selected['Tmin']),
-            'Tsoil_max':    max(hist_data_selected['Tsoil']),
-            'Tsoil_min':    min(hist_data_selected['Tsoil']),
-            'Hum_max':      max(hist_data_selected['Humidity']),
-            'Hum_min':      min(hist_data_selected['Humidity']),
-            'Wind_max':     max(hist_data_selected['Wind']),
+            'Tmax':         round(max(hist_data['Tmax']), 1),
+            'Tmin':         round(min(hist_data['Tmin']), 1),
+            'Tsoil_max':    round(max(hist_data['Tsoil']), 1),
+            'Tsoil_min':    round(min(hist_data['Tsoil']), 1),
+            'Hum_max':      round(max(hist_data['Humidity']), 0),
+            'Hum_min':      round(min(hist_data['Humidity']), 0),
+            'Wind_max':     round(max(hist_data['Wind']), 1),
         }
 
         data = {
-            'PearsonCorr': PearsonCorr(hist_data_selected),
+            'PearsonCorr': PearsonCorr(hist_data),
             'station_name': station_name,
-            'data': hist_data_selected,
+            'data': hist_data,
             'stations_list': stations_list,
             'extreme_values': extreme_values,
         }
@@ -167,3 +176,16 @@ def selectStation(request):
     request.session['station_name'] = station_name['station_name']
 
     return JsonResponse('cart is completed', safe=False)
+
+def sendMsg(request):
+    msg_data = json.loads(request.body)
+
+    send_mail(
+        'Generic contact from website',
+        msg_data,
+        str(os.getenv('FROM_EMAIL_ADDRESS')),
+        [str(os.getenv('TO_EMAIL_ADDRESS'))],
+        fail_silently=False,
+    )
+
+    return JsonResponse('msg was send..', safe=False)

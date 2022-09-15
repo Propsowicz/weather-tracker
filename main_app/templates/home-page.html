@@ -96,20 +96,20 @@
                 <div class="wind-chart">                               
                     <div class="chart-info">
                         <div class="inside-chart-info">
-                            <p><br><br><br>                             
+                            <p><br><br><br>                  
                                 This histogram presents distribution of tempereature's differences from real measurement.                                
-                            </p><br><br><br>                          
+                            </p><br><br><br>                                                
                             <p>
-                                The biggest spread of each forecast are:
+                                The standard deviation and the biggest spread of each forecast are:
                             </p><br><br><br>
                             <p>
-                                - Forecast #1: <span id="txt-fs-1">-</span>°C
+                                - #1: <span id="txt-fs-1">-</span>°C (SD: <span id="txt-fstd-1">-</span>) 
                             </p><br>
                             <p>
-                                - Forecast #2: <span id="txt-fs-2">-</span>°C
+                                - #2: <span id="txt-fs-2">-</span>°C (SD: <span id="txt-fstd-2">-</span>)
                             </p><br>
                             <p>
-                                - Forecast #3: <span id="txt-fs-3">-</span>°C
+                                - #3: <span id="txt-fs-3">-</span>°C (SD: <span id="txt-fstd-3">-</span>)
                             </p>                            
                         </div>    
                     </div>
@@ -152,6 +152,9 @@
             document.querySelector('#txt-fs-2').innerText = weather_data.stat_data.forecast_2.t_spread
             document.querySelector('#txt-f-3').innerText = weather_data.stat_data.forecast_3.t_mean
             document.querySelector('#txt-fs-3').innerText = weather_data.stat_data.forecast_3.t_spread
+            document.querySelector('#txt-fstd-1').innerText = weather_data.stat_data.forecast_1.std_dev
+            document.querySelector('#txt-fstd-2').innerText = weather_data.stat_data.forecast_2.std_dev
+            document.querySelector('#txt-fstd-3').innerText = weather_data.stat_data.forecast_3.std_dev
         },
         error: function(weather_data){
             console.log('error')

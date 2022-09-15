@@ -5,6 +5,24 @@
     <title>Title</title>
 </head>
 <body>
-    <p>Data has been loaded..</p>
+    <h1>CSV loader script</h1>
+    <p>Data is loaded from 2 csv files in formats as below. Just choose correct year and submit data. CSV files gonna load fo DB and then the DB will be validated (weather station with less measurements will be deleted).</p>
+    <p>Remember that csv files need to be stored in static/dane pogodwe dir and the should be csv files for whole year.</p><br><br>
+    <div>
+        <form method="post">
+            {%csrf_token%}
+            <p>CSV files format:</p>
+            <p>k_d_MONTH_YEAR.csv || k_d_t_MONTH_YEAR.csv</p>
+            <label for="data-1">input year of csv files</label>
+            <input id="data-1" type="text" placeholder="2020" name="year_to_submit">
+            <button type="submit" name="submit_data" value="submit_data">Send data</button>
+        </form>
+    </div>
+
+ 
+    
+    
+
+    
 </body>
 </html>

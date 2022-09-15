@@ -184,7 +184,7 @@ main{
 .inside-chart-info{
     /* background-color: rgb(181, 255, 108); */
     background-color: #0084ff;
-    padding: 1rem 0.3rem;
+    padding: 1rem 0.2rem;
     text-align: center;
     border-radius: 1.5rem;
     min-width: 13rem;
@@ -281,14 +281,22 @@ br{
 /* MAIN -- end */
 article{
     padding-top: 3rem;
-    background-color: var(--col-prm1);
-    
+    background-color: var(--col-prm1);    
+}
+select{
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  padding: 0.1rem;
+  margin: 0;
+  
 }
 .station-select-nav{
-    width: 67.5%;
+    width: 100%;
     margin: 0 auto;
-    padding: 0.5rem;
+    padding:  0.2rem 0.5rem;
     position: fixed;
+    background-color: var(--col-prm1);
 }
 .station-select-nav input{
     border: none;
@@ -301,7 +309,6 @@ article{
     resize: none;
     padding: 0.4rem;
 }
-
 .msg{
     padding: 1rem 0;
 }
@@ -322,10 +329,11 @@ article{
     cursor: pointer;
     font-weight: 700;
 }
-
-
-
-
+.contact-alert{
+    color: #8466E6;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
 /* CONTACT -- end */
 
 

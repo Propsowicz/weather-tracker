@@ -22,7 +22,7 @@ app.conf.beat_schedule = {
     },
     'add_forecasts': {
         'task': 'main_app.tasks.get_tomorrows_forecast',
-        'schedule': crontab(hour=19, minute=50),
+        'schedule': crontab(hour=22, minute=30),
     },
     'check_for_alerts': {
         'task': 'main_app.tasks.send_alert_msg',

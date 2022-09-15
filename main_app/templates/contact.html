@@ -13,7 +13,7 @@
     <main>
 
             <div class="chart-box">
-                <h2>Contact me!</h2>
+                <h2 id="contact-heading">Contact me!</h2>
                     <div>
                         <div class="msg">
                             <label for="contact-msg">Message:</label>
@@ -41,14 +41,45 @@
         const textMsg = document.querySelector('#contact-msg')
         const emailMsg = document.querySelector('#contact-mail')
         const nameMsg = document.querySelector('#contact-name')
+        const head = document.querySelector('#contact-heading')
 
         sendMsg.addEventListener('click', () => {
-            let msg = `Message: ${textMsg.value}, by: ${nameMsg.value}`
-            let emailAddress = emailMsg.value
-            let sendData = [{'msg': msg}, {'email': emailAddress}]
-            console.log(sendData)
-        })
+            
+            let msg = `Message: ${textMsg.value}, by: ${nameMsg.value} [${emailMsg.value}]`
+            
 
+            if(msg !== `Message: , by:  []`){
+                sendEmail(msg)
+                showAlert('The message has been send!')
+            }else{
+                showAlert('Please fill in all fields!')              
+            }            
+        })
+        
+        function showAlert(text){
+            alert = document.createElement('p')
+            alert.innerText = text
+            alert.className = 'contact-alert'
+            head.appendChild(alert)
+        }
+
+        function sendEmail(sendData){
+            const url =  "{% url 'send-msg' %}"
+            fetch(url, {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body:JSON.stringify(sendData)
+            })
+            .then((response) => {
+                return response.json()
+            })
+            .then((data) => {
+                location.reload()
+            })
+        }
     </script>
     {% endblock %}
 </body>

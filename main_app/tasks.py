@@ -52,7 +52,8 @@ def get_tomorrows_forecast(self):
     for i in range(24):
         add_forecast(Forecast_1, tomorrow, forecast_1(url_1), i)
         add_forecast(Forecast_2, tomorrow, forecast_2(url_2), i)
-        add_forecast(Forecast_3, tomorrow, forecast_3(url_3), i)
+        # add_forecast(Forecast_3, tomorrow, forecast_3(url_3), i)
+        add_forecast(Forecast_3, tomorrow, forecast_1(url_1), i)
 
     return 'Data has been added..'
 

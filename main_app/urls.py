@@ -13,6 +13,7 @@ urlpatterns = [
     path('csvloader/', csvLoader, name='csv-load'),
 
     path('api/chart', chartXscale, name='chart-x-scale'),
+    path('api/send_msg', sendMsg, name='send-msg'),
     path('api/station', selectStation, name='select-station'),
     path('api/data', WeatherLive.as_view(), name='api-view'),
     path('api/hist/data', WeatherHist.as_view(), name='api-hist-view'),

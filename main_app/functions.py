@@ -4,7 +4,7 @@ from statistics import mean, stdev
 import numpy as np
 import pandas as pd
 from sms import send_sms
-
+import array
 
 def render_data(DailyMeasurement, days):
     first_day_to_render = date.today() - timedelta(days=days)
@@ -139,18 +139,21 @@ def analyze_current_weather(hour_range, data_list_):
             'w_mean': m_f1_avg_wind,
             't_spread': max(m_f1_temp),
             'w_spread': max(m_f1_wind),
+            'std_dev': round((stdev(m_f1_temp)), 2),
         },
         'forecast_2': {
             't_mean': m_f2_avg_temp,
             'w_mean': m_f2_avg_wind,
             't_spread': max(m_f2_temp),
             'w_spread': max(m_f2_wind),
+            'std_dev': round((stdev(m_f2_temp)), 2),
         },
         'forecast_3': {
             't_mean': m_f3_avg_temp,
             'w_mean': m_f3_avg_wind,
             't_spread': max(m_f3_temp),
             'w_spread': max(m_f3_wind),
+            'std_dev': round(stdev(m_f3_temp), 2),
         },
     }
 
@@ -173,60 +176,53 @@ def send_alert(DailyMeasurement, AlertMsg):
     else:
         pass
 
-def historical_data(WeatherStation, StationsMeasurement):
 
+
+def historical_data(WeatherStation, StationsMeasurement, StationName):
     data = {}
-    all_stations = WeatherStation.objects.all()
-    for station in all_stations:
-        date_list = []
-        Tmin_list = []
-        Tmax_list = []
-        Tmean_list = []
-        Tsoil_list = []
-        Humidity_list = []
-        Wind_list = []
-        Overcast_list = []
+    station = WeatherStation.objects.get(name=StationName)
 
-        all_measurements = station.stationsmeasurement_set.all().order_by('date')
-        for day in all_measurements:
-            try:
-                date_list.append(day.date)
-                Tmin_list.append(float(day.Tmin))
-                Tmax_list.append(float(day.Tmax))
-                Tmean_list.append(float(day.Tmean))
-                Tsoil_list.append(float(day.Tsoil))
-                Humidity_list.append(float(day.Humidity))
-                Wind_list.append(float(day.Wind))
-                Overcast_list.append(float(day.Overcast))
-            except:
-                date_list.append(day.date)
-                Tmin_list.append(day.Tmin)
-                Tmax_list.append(day.Tmax)
-                Tmean_list.append(day.Tmean)
-                Tsoil_list.append(day.Tsoil)
-                Humidity_list.append(day.Humidity)
-                Wind_list.append(day.Wind)
-                Overcast_list.append(day.Overcast)
+    date_list = []
+    Tmin_list = array.array('f', [])
+    Tmax_list = array.array('f', [])
+    Tmean_list = array.array('f', [])
+    Tsoil_list = array.array('f', [])
+    Humidity_list = array.array('f', [])
+    Wind_list = array.array('f', [])
+    Overcast_list = array.array('f', [])
 
-            
-            # checking if weather data is for whole time period
-            if len(date_list) == 1096:
-                data[station.name] = {
-                    'date': date_list,
-                    'Tmin': Tmin_list,
-                    'Tmax': Tmax_list,
-                    'Tmean': Tmean_list,
-                    'Tsoil': Tsoil_list,
-                    'Humidity': Humidity_list,
-                    'Wind': Wind_list,
-                    'Overcast': Overcast_list,
+    all_measurements = station.stationsmeasurement_set.all().order_by('date')
+    for day in all_measurements:
+        try:
+            date_list.append(day.date)
+            Tmin_list.append(float(day.Tmin))
+            Tmax_list.append(float(day.Tmax))
+            Tmean_list.append(float(day.Tmean))
+            Tsoil_list.append(float(day.Tsoil))
+            Humidity_list.append(float(day.Humidity))
+            Wind_list.append(float(day.Wind))
+            Overcast_list.append(float(day.Overcast))
+        except:
+            date_list.append(day.date)
+            Tmin_list.append(day.Tmin)
+            Tmax_list.append(day.Tmax)
+            Tmean_list.append(day.Tmean)
+            Tsoil_list.append(day.Tsoil)
+            Humidity_list.append(day.Humidity)
+            Wind_list.append(day.Wind)
+            Overcast_list.append(day.Overcast)
 
-                }
-
-
-            else:
-                pass
-
+        # checking if weather data is for whole time period
+        data = {
+            'date': date_list,
+            'Tmin': Tmin_list,
+            'Tmax': Tmax_list,
+            'Tmean': Tmean_list,
+            'Tsoil': Tsoil_list,
+            'Humidity': Humidity_list,
+            'Wind': Wind_list,
+            'Overcast': Overcast_list,
+        }
     return data
 
 def PearsonCorr(data_dict):
