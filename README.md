@@ -1,11 +1,11 @@
 # Weather Tracker
 
-Weather tracker is applications which collects real weather measurments and compares them with three different weather forecasts. The data is gathered from yesterday's forecasts and compared with today's measurments hour by hour. The application works in task que schedule:
+Weather tracker is an application which collects real weather measurments and compares them with three different weather forecasts. The data is gathered from yesterday's forecasts and compared with today's measurments hour by hour. The application works in task que schedule:
 - everyday, at 6pm, the application web scraps tomorrow's forecasts,
 - for every hour, the application calls OpenWeather API for current weather data.
 - for every 30 minutes, the application checks for thunderstorm, and, eventually, sends the alert to the user.
 
-Application also presents and analyze historical weather data from meteo stations.
+The application also presents and analyzes historical weather data from meteo stations.
 
 ## Table of content
 
@@ -49,17 +49,17 @@ Application also presents and analyze historical weather data from meteo station
 
 ## Description
 
-Application was created in 2 views mode. All data is sended to frontend through RESTFramework and rendered live into charts. Website contains contact form to contact with administator.
+The application was created in 2 views mode. All data is sent to frontend through RESTFramework and rendered live to the charts. The website contains a contact form to communicate with the administator.
 
 #### Weather Tracker
 
-Everyday forecasts are collected by web scraping meteo websites using BeatifulSoup 4.11.1 Python library. Real weather data is called from OpenWeatherAPI. Above processes are executed in background by Celery worker, in specific schedule determined in Redis database. Eventually data is analyzed via Python math and statistics libraries to find most precise forecast.
+Daily forecasts are collected by web scraping meteo websites using BeatifulSoup 4.11.1 Python library. Real weather data is called from OpenWeatherAPI. The above mentioned processes are executed in background by Celery worker, in a specific schedule determined in Redis database. Eventually, the data is analyzed via Python math and statistics libraries to find the most precise forecast.
 
-If application get information about thunderstorm in local area, it sends sms to selected users. 
+If the application gets information about thunderstorm in local area, it sends sms to the selected users. 
 
 #### Historical Data
 
-Archival data is gathered from .csv files by using simple script, which is avaible only to admin user. Next the data is saved to database and then analyzed to find correlation between measurements. 
+Archival data is gathered from .csv files by a simple script, which is avaible only to the admin user. Next, the data is saved in database and then analyzed to find the correlation between the measurements. 
 
 ## Illustrations
 
