@@ -6,8 +6,11 @@ import pandas as pd
 from sms import send_sms
 import array
 
-def render_data(DailyMeasurement, days):
-    first_day_to_render = date.today() - timedelta(days=days)
+# home-page functions:
+def render_data(DailyMeasurement, days):    # creating dict with data to send it (via JSON) to frontend
+    lastbutone_date = DailyMeasurement.objects.latest('id').date - timedelta(days=1)
+    # first_day_to_render = date.today() - timedelta(days=days)       # whenever virtual machine with celery and redis is running it should send data with today's index
+    first_day_to_render = lastbutone_date - timedelta(days=days)      # dummy way to generate data from last but one record in query set (in case celery won't run for few days)
     analyzed_days = DailyMeasurement.objects.all().filter(date__gte=first_day_to_render).order_by('id')
 
     data = {}
@@ -36,26 +39,24 @@ def render_data(DailyMeasurement, days):
         data[str(day.date)] = daily_data
     return data
 
-def hours_list(days, data, index):
+def hours_list(days, data, index):      # creating xScale list of hours
     new_list = []
     for _ in range(days):
         for i in data[(list(data)[index - (days - _ - 1)])]:
             new_list.append(f'{list(data)[index - (days - _ - 1)]}:{i}:00')
-
     return new_list
 
-def data_list(days, data, index, key, value):
-    new_list = []
+def data_list(days, data, index, key, value):       # creating arrays for Yscale in charts
+    new_list = array.array('f', [])
     for _ in range(days):
         for i in data[(list(data)[index - (days - _ - 1)])]:
             new_list.append(data[(list(data)[index - (days - _ - 1)])][i][key][value])
-
     return new_list
 
-def add_forecast(model, day, function, key):
+def add_forecast(model, day, function, key):        # function to save web scraped data from forecasts to database
     model.objects.create(day=day, hour=function[0][key], temperature=function[1][key], wind_speed=function[2][key])
 
-def data_list_items(days, data, hour_range, todays_index):
+def data_list_items(days, data, hour_range, todays_index):      # render arrays to charts
     measurement_temp_list = data_list(days, data, todays_index, 'measurement', 'temperature')[-hour_range:]
     forecast_1_temp_list = data_list(days, data, todays_index, 'forecast_1', 'temperature')[-hour_range:]
     forecast_2_temp_list = data_list(days, data, todays_index, 'forecast_2', 'temperature')[-hour_range:]
@@ -67,12 +68,8 @@ def data_list_items(days, data, hour_range, todays_index):
 
     return measurement_temp_list, forecast_1_temp_list, forecast_2_temp_list, forecast_3_temp_list, measurement_wind_list, forecast_1_wind_list, forecast_2_wind_list, forecast_3_wind_list
 
-def analyze_current_weather(hour_range, data_list_):
+def analyze_current_weather(hour_range, data_list_):        # func to calculate st. deviaton and create difference analyze
     assert hour_range == len(data_list_[0]), 'data is not updated - need to change ranges in belows loops (list has [hours_range - 1] length)'
-    # ok już wiem co jest z tym błędem:
-    # jak mam poprzedni dzień z 22 godzinami to brakuje mu jednej godziny żeby mieć na liście 24 pozycje
-    # i się krzaczy bo ma tylko 23...
-
     # lists naming code: m_f1_temp -> measurement_forecast1_temperature analysis
     m_f1_temp, m_f1_wind = [], []
     m_f2_temp, m_f2_wind = [], []
@@ -132,6 +129,7 @@ def analyze_current_weather(hour_range, data_list_):
     f2_gauss = Gauss_func(m_f2_temp, float(mean(m_f2_temp)), float(stdev(m_f2_temp)))
     f3_gauss = Gauss_func(m_f3_temp, float(mean(m_f3_temp)), float(stdev(m_f3_temp)))
 
+    # characteristic values of analyze
     stat_data = {
         'hours': hour_range,
         'forecast_1': {
@@ -156,14 +154,13 @@ def analyze_current_weather(hour_range, data_list_):
             'std_dev': round(stdev(m_f3_temp), 2),
         },
     }
-
     return stat_data, m_f1_temp, m_f2_temp, m_f3_temp, f1_gauss, f2_gauss, f3_gauss
 
-
-def send_alert(DailyMeasurement, AlertMsg):
+def send_alert(DailyMeasurement, AlertMsg):     # function to send alert when thundestorm comes
+    # the functions send only one sms per day - thunderstorms generally happens once per day (usually they comes one after another)
     todays_date = date.today()
     today = DailyMeasurement.objects.get(date=todays_date)
-    AlertMsg.objects.all().exclude(day=today).delete()
+    AlertMsg.objects.all().exclude(day=today).delete()      # this one cleans all database so it dont store garbage info
 
     if AlertMsg.objects.all().filter(day=today).count() == 0:
         AlertMsg.objects.create(day=today)
@@ -176,9 +173,8 @@ def send_alert(DailyMeasurement, AlertMsg):
     else:
         pass
 
-
-
-def historical_data(WeatherStation, StationsMeasurement, StationName):
+# historical-data functions:
+def historical_data(WeatherStation, StationsMeasurement, StationName):      # create arrays to render charts (creating them as array.array to make app run faster)
     data = {}
     station = WeatherStation.objects.get(name=StationName)
 
@@ -212,7 +208,6 @@ def historical_data(WeatherStation, StationsMeasurement, StationName):
             Wind_list.append(day.Wind)
             Overcast_list.append(day.Overcast)
 
-        # checking if weather data is for whole time period
         data = {
             'date': date_list,
             'Tmin': Tmin_list,
@@ -225,10 +220,9 @@ def historical_data(WeatherStation, StationsMeasurement, StationName):
         }
     return data
 
-def PearsonCorr(data_dict):
+def PearsonCorr(data_dict):     # calculating Pearson corr and creating dict to JSON it
     df = pd.DataFrame.from_dict(data_dict)
     Pcorr = df.corr()
-    # print(Pcorr)
 
     i = 0
     matrix_list = []

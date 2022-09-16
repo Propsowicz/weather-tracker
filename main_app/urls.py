@@ -5,13 +5,15 @@ from django.conf.urls.static import static
 from .views import *
 
 urlpatterns = [
-
+    # web pages
     path('', HomePage, name='home-page'),
     path('historical/', HistoricalData, name='historical'),
     path('contact/', Contact, name='contact'),
 
+    # csv loader script
     path('csvloader/', csvLoader, name='csv-load'),
 
+    # APIs
     path('api/chart', chartXscale, name='chart-x-scale'),
     path('api/send_msg', sendMsg, name='send-msg'),
     path('api/station', selectStation, name='select-station'),

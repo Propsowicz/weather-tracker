@@ -1,43 +1,14 @@
 from datetime import date
-
 from bs4 import *
-import lxml
 import requests
-# url = 'https://pl.meteopost.com/pogoda/kielce-sukow/'
 
-
-# COLLECTING CURRENT WEATHER FROM KIELCE-SUKÓW METEO STATION
-def current_weather(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
-        "Accept-Language": "en",
-    }
-
-    r = requests.get(url, headers=headers)
-    soup = BeautifulSoup(r.text, "lxml")
-
-    table = soup.find('table', attrs={"class": "divhelp"})
-    table_values = table.find_all('td', attrs={"class": "dat"})
-    table_headings = table.find_all('td', attrs={"class": "head2"})
-
-    dict_current_weather = {}
-
-    if len(table_headings) == len(table_values):
-        for i in range(len(table_headings)):
-            dict_current_weather[table_headings[i].getText()] = table_values[i].getText()
-
-    return dict_current_weather
-
-
-
-
+# forecasts web scrapers
 url = 'https://www.meteoprog.pl/pl/meteograms/Keltse/'
 def forecast_1(url):  # 'https://www.meteoprog.pl/pl/meteograms/Keltse/'
     headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
             "Accept-Language": "en",
         }
-
     r = requests.get(url, headers=headers)
     soup = BeautifulSoup(r.text, "lxml")
 
@@ -64,8 +35,6 @@ def forecast_1(url):  # 'https://www.meteoprog.pl/pl/meteograms/Keltse/'
         wind_list.append(float(w))
 
     return hours_list, temp_list, wind_list
-
-
 
 url1 = 'https://pogoda.interia.pl/prognoza-szczegolowa-kielce,cId,13378'
 def forecast_2(url):  # 'https://pogoda.interia.pl/prognoza-szczegolowa-kielce,cId,13378'
@@ -101,9 +70,6 @@ def forecast_2(url):  # 'https://pogoda.interia.pl/prognoza-szczegolowa-kielce,c
 
     return hours_list, temp_list, wind_list
 
-
-
-
 url2 = 'https://weather.com/pl-PL/pogoda/godzinowa/l/08b809af5fb69a30123db9d3475cb38269a485132a1863d847de90ebd3d7962e'
 def forecast_3(url):  # 'https://weather.com/pl-PL/pogoda/godzinowa/l/08b809af5fb69a30123db9d3475cb38269a485132a1863d847de90ebd3d7962e'
 
@@ -135,7 +101,7 @@ def forecast_3(url):  # 'https://weather.com/pl-PL/pogoda/godzinowa/l/08b809af5f
         looped_sibling = looped_sibling.next_sibling
 
     return hours_list, temp_list, wind_list
-#
+
 # print(forecast_1(url))
 # print(forecast_2(url1))
 # print(forecast_3(url2))

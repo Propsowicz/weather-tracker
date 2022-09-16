@@ -336,6 +336,10 @@ select{
 }
 /* CONTACT -- end */
 
-
 /* FOOTER -- start */
+footer{
+    width: 100%;
+    margin-top: 2rem;
+    text-align: center;
+}
 /* FOOTER -- end */

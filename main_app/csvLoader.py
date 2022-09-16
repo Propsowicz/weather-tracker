@@ -1,9 +1,6 @@
 import csv
 from datetime import datetime
 
-
-
-
 # loading data in format: k_d_month_year
 def importCSVtoDB(filename, StationDB, MeaseruementDB):
     with open(f'static/dane pogodowe/{filename}') as csvfile:
@@ -32,6 +29,7 @@ def importCSVtoDB_t(filename, StationDB, MeaseruementDB):
             else:
                 pass
 
+# validate weather station list - whenever station doesnt have enough data (quantity of days with measurement are smaller than max), gets deleted
 def validation_of_stations(StationDB, MeaseruementDB):
     measured_days = []
     station_name = []

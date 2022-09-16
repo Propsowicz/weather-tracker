@@ -1,6 +1,5 @@
 from __future__ import absolute_import, unicode_literals
 import os
-
 from celery import Celery
 from django.conf import settings
 from celery.schedules import crontab
@@ -22,14 +21,13 @@ app.conf.beat_schedule = {
     },
     'add_forecasts': {
         'task': 'main_app.tasks.get_tomorrows_forecast',
-        'schedule': crontab(hour=22, minute=30),
+        'schedule': crontab(hour=20, minute=12),
     },
     'check_for_alerts': {
         'task': 'main_app.tasks.send_alert_msg',
         'schedule': 1800,
     },
 }
-
 
 app.autodiscover_tasks()
 

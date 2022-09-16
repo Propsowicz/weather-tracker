@@ -23,7 +23,7 @@ from datetime import datetime, date, timedelta
 
 
 @shared_task(bind=True)
-def get_actual_weather(self):
+def get_actual_weather(self):   # receiving weather data from OpenWeatherAPI
     url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=' + str(os.getenv('API_key'))
     city = 'Kielce'
     city_weather = requests.get(url.format(city)).json()
@@ -39,7 +39,7 @@ def get_actual_weather(self):
 
     return 'Data has been added..'
 
-@shared_task(bind=True)
+@shared_task(bind=True)     # web scraping for tommorow's forecasts
 def get_tomorrows_forecast(self):
     tomorrows_date = date.today() + timedelta(days=1)
     # tomorrows_date = date.today()
@@ -52,12 +52,11 @@ def get_tomorrows_forecast(self):
     for i in range(24):
         add_forecast(Forecast_1, tomorrow, forecast_1(url_1), i)
         add_forecast(Forecast_2, tomorrow, forecast_2(url_2), i)
-        # add_forecast(Forecast_3, tomorrow, forecast_3(url_3), i)
-        add_forecast(Forecast_3, tomorrow, forecast_1(url_1), i)
+        add_forecast(Forecast_3, tomorrow, forecast_3(url_3), i)
 
     return 'Data has been added..'
 
-@shared_task(bind=True)
+@shared_task(bind=True)   # receiving weather data from OpenWeatherAPI (check if there is a thunderstorm and send alert sms)
 def send_alert_msg(self):
     url = 'http://api.openweathermap.org/data/2.5/weather?q={}&units=imperial&appid=' + str(os.getenv('API_key'))
     city = 'Kielce'

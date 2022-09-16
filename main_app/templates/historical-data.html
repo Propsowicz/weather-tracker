@@ -5,22 +5,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Historcal data</title>
 
-    <link rel="stylesheet" href="{% static 'css/.css' %}">
-
-
-    
-
+    <link rel="stylesheet" href="{% static 'css/.css' %}">  
 </head>
 <body>
-
-
     {% block charts %}
     <article>  
         <div class="station-select-nav">
             <label style="color: black;">Weather station:</label>
-            <!-- <input list="stations-list">  -->
             <select id="stations-list">            
             </select>
         </div>
@@ -28,7 +21,7 @@
     <main>
         <div class="main-charts">
             <div class="chart-box">
-                <h2>Temperature - <span class="station-name"></span></h2>
+                <h2>Temperature - <span class="station-name">-</span></h2>
                 <div class="temp-chart">
                     <div class="chart">
                         <canvas id="tempChart"></canvas>
@@ -46,7 +39,7 @@
                 </div>
             </div>  
             <div class="chart-box">
-                <h2>Humidity - <span class="station-name"></span></h2>
+                <h2>Humidity - <span class="station-name">-</span></h2>
                 <div class="wind-chart">                               
                     <div class="chart-info">
                         <div class="inside-chart-info">
@@ -61,11 +54,9 @@
                     </div> 
                 </div>
             </div>
-
-
             <div class="main-charts">
                 <div class="chart-box">
-                    <h2>Wind speed - <span class="station-name"></span></h2>
+                    <h2>Wind speed - <span class="station-name">-</span></h2>
                     <div class="temp-chart">
                         <div class="chart">
                             <canvas id="windChart"></canvas>
@@ -80,7 +71,7 @@
                     </div>
                 </div>  
                 <div class="chart-box">
-                    <h2>Overcast clouds - <span class="station-name"></span></h2>
+                    <h2>Overcast - <span class="station-name">-</span></h2>
                     <div class="wind-chart">                               
                         <div class="chart-info">
                             <div class="inside-chart-info">
@@ -97,12 +88,10 @@
                             <canvas id="overcastChart"></canvas>
                         </div> 
                     </div>
-                </div>
-                
-                <div class="main-charts">
-                    
+                </div>                
+                <div class="main-charts">                    
                     <div class="chart-box">
-                        <h2>Pearson correlation - <span class="station-name"></span></h2>
+                        <h2>Pearson correlation - <span class="station-name">-</span></h2>
                         <div class="temp-chart">
                             <div class="chart">
                                 <canvas id="matrixChart"></canvas>
@@ -114,29 +103,21 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-
-                    
-
-
-
-
-            <br><br><br><br><br><br><br><br>
-            <p>Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki Wodnej – Państwowy Instytut Badawczy.</p>
-            <p>Dane Instytutu Meteorologii i Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone.</p>
+                    </div>                          
     </main>
-    
+    <footer>        
+        <p>Źródłem pochodzenia danych jest Instytut Meteorologii i Gospodarki Wodnej – Państwowy Instytut Badawczy.</p>
+        <p>Dane Instytutu Meteorologii i Gospodarki Wodnej – Państwowego Instytutu Badawczego zostały przetworzone.</p>
+    </footer>    
     {% endblock %}
-
 
     {% block scripts %}
     <script>
+        // view mode for matrix chart
         const navBtns = document.querySelectorAll('.chart-range')
         for(let i = 0; navBtns.length; i++){
             navBtns[i].style.visibility = 'hidden'
         }
-
         function darkModeMatrixChart(Chart){                
                 Chart.config.options.scales.x.ticks.color = '#e8e8e8'                
                 Chart.config.options.scales.y.ticks.color = '#e8e8e8'
@@ -174,14 +155,13 @@
     </script>
 
     <script>
+    // receiving data from backend
     var endpoint = '/api/hist/data'
     $.ajax({
         method: 'GET',
         url: endpoint,
         success: function(data){
-            console.log(data)
-           
-            
+            // creating charts
             temp_chart(data.data)
             humidity_chart(data.data)
             wind_chart(data.data)
@@ -201,11 +181,10 @@
             const selectorDiv = document.querySelector('#stations-list')
             const stations_list = data.stations_list
 
-            // transform Object to Array (so i can sort it in PL)
+                // transform Object to Array (so i can sort it in PL)
             const stations_listArr = Object.keys(stations_list).map(function(key){
                 return stations_list[key]
             })
-
             stations_listArr.sort(Intl.Collator().compare)            
 
             for(let i = 0; i < stations_listArr.length; i++){
@@ -218,240 +197,215 @@
                 selectorDiv.appendChild(opt)
             }
             
+            // showing selected weather station name
             const stationNameSpan = document.querySelectorAll('.station-name')
             for(let i = 0; stationNameSpan.length; i++){
                 stationNameSpan[i].innerText = data.station_name
-            }
-
-            
-            
+            }          
         },  
         error: function(data){
             console.log('error')
         }
         })
 
-
-    function temp_chart(data){
-       
-    const labels = data.date;
-    const Tmax = data.Tmax;
-    const Tmean = data.Tmean;
-    const Tmin = data.Tmin;
-    const Tsoil = data.Tsoil;
-
-
-    const chart_data = {
-        labels: labels,
-        datasets: [{
-            label: 'Max temperature',
-            backgroundColor: 'rgb(255, 0, 0)',
-            borderColor: 'rgb(255, 0, 0)',
-            data: Tmax,
-            },
-            {
-            label: 'Mean temperature',
-            backgroundColor: 'rgb(255, 0, 255)',
-            borderColor: 'rgb(255, 0, 255)',
-            data: Tmean,
-            }, 
-            {
-            label: 'Min temperature',
-            backgroundColor: 'rgb(255, 255, 0)',
-            borderColor: 'rgb(255, 255, 0)',
-            data: Tmin,
-            }, 
-            {
-            label: 'Soil temperature',
-            backgroundColor: 'rgb(0, 0, 255)',
-            borderColor: 'rgb(0, 0, 255)',
-            data: Tsoil,
-            },         
-        ]
-    };
-
-    const config = {
-        type: 'line',
-        data: chart_data,
-        options: {
-            animation: false,
-            elements:{
-                point:{
-                    radius: 0
-                }
-            },
-            plugins: {
-                legend: {
-                    labels:{
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
+    function temp_chart(data){       
+        const labels = data.date;
+        const Tmax = data.Tmax;
+        const Tmean = data.Tmean;
+        const Tmin = data.Tmin;
+        const Tsoil = data.Tsoil;
+        const chart_data = {
+            labels: labels,
+            datasets: [{
+                label: 'Max temperature',
+                backgroundColor: 'rgb(255, 0, 0)',
+                borderColor: 'rgb(255, 0, 0)',
+                data: Tmax,
                 },
-            },
-            scales:{
-                x:{
-                    title: {
-                        display: true,
-                        text: 'days',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'temperature [°C]',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                                    
-            },
-
-            }
+                {
+                label: 'Mean temperature',
+                backgroundColor: 'rgb(255, 0, 255)',
+                borderColor: 'rgb(255, 0, 255)',
+                data: Tmean,
+                }, 
+                {
+                label: 'Min temperature',
+                backgroundColor: 'rgb(255, 255, 0)',
+                borderColor: 'rgb(255, 255, 0)',
+                data: Tmin,
+                }, 
+                {
+                label: 'Soil temperature',
+                backgroundColor: 'rgb(0, 0, 255)',
+                borderColor: 'rgb(0, 0, 255)',
+                data: Tsoil,
+                },         
+            ]
         };
-
-    const tempChart = new Chart(document.getElementById('tempChart'),
-    config  
-    );
-
-    // dark/light mode -- start    
-    changeViewMode(tempChart)  
-    // dark/light mode -- end
+        const config = {
+            type: 'line',
+            data: chart_data,
+            options: {
+                animation: false,
+                elements:{
+                    point:{
+                        radius: 0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels:{
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                    },
+                },
+                scales:{
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'days',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'temperature [°C]',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },                                        
+                },
+                }
+            };
+        const tempChart = new Chart(document.getElementById('tempChart'),
+        config  
+        );
+        // view mode   
+        changeViewMode(tempChart)  
     }
 
 
     function wind_chart(data){        
-    const labels = data.date;
-    const wind = data.Wind;
-
-    const chart_data = {
-    labels: labels,
-    datasets: [{
-        label: 'Wind speed',
-        backgroundColor: 'rgb(0, 0, 255)',
-        borderColor: 'rgb(0, 0, 255)',
-        data: wind,
-        },
-                
-    ]
-    };
-
-    const config = {
-        type: 'line',
-        data: chart_data,
-        options: {
-            animation: false,
-            elements:{
-                point:{
-                    radius: 0
-                }
+        const labels = data.date;
+        const wind = data.Wind;
+        const chart_data = {
+        labels: labels,
+        datasets: [{
+            label: 'Wind speed',
+            backgroundColor: 'rgb(0, 0, 255)',
+            borderColor: 'rgb(0, 0, 255)',
+            data: wind,
             },
-            plugins: {
-                legend: {
-                    labels:{
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                },
-            },
-            scales:{
-                x:{
-                    title: {
-                        display: true,
-                        text: 'days',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'wind speed [m/s]',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                                    
-            },
-
-            }
+                    
+        ]
         };
-
-        const windChart = new Chart(document.getElementById('windChart'),
-        config  
-        );
-
-        // dark/light mode -- start    
+        const config = {
+            type: 'line',
+            data: chart_data,
+            options: {
+                animation: false,
+                elements:{
+                    point:{
+                        radius: 0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels:{
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                    },
+                },
+                scales:{
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'days',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'wind speed [m/s]',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },                                        
+                },
+                }
+            };
+            const windChart = new Chart(document.getElementById('windChart'),
+            config  
+            );
+        // view mode   
         changeViewMode(windChart)  
-        // dark/light mode -- end
-        }
-
-
-
-
-
+    }
 
     function overcast_chart(data){        
-    const labels = data.date;
-    const wind = data.Overcast;
-
+        const labels = data.date;
+        const wind = data.Overcast;
         const chart_data = {
         labels: labels,
         datasets: [{
@@ -462,292 +416,264 @@
             },
                     
         ]
-    };
-
-    const config = {
-        type: 'bar',
-        data: chart_data,
-        options: {
-            animation: false,
-            elements:{
-                point:{
-                    radius: 0
-                }
-            },
-            plugins: {
-                legend: {
-                    labels:{
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                },
-            },
-            scales:{
-                x:{
-                    title: {
-                        display: true,
-                        text: 'days',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'oktas',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                                    
-            },
-
-            }
         };
-
+        const config = {
+            type: 'bar',
+            data: chart_data,
+            options: {
+                animation: false,
+                elements:{
+                    point:{
+                        radius: 0
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels:{
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                    },
+                },
+                scales:{
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'days',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'oktas',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },                                        
+                },
+                }
+            };
         const overcastChart = new Chart(document.getElementById('overcastChart'),
         config  
         );
-
-        // dark/light mode -- start    
+        // view mode   
         changeViewMode(overcastChart)  
+    }
 
-        // dark/light mode -- end
-        }
-
-        function humidity_chart(data){
-        
-    const labels = data.date;
-    const wind = data.Humidity;
-
-
-        const chart_data = {
-        labels: labels,
-        datasets: [{
-            label: 'Humidity',
-            backgroundColor: 'rgb(0, 0, 255)',
-            borderColor: 'rgb(0, 0, 255)',
-            data: wind,
-            },
-                    
-        ]
-    };
-
-    const config = {
-        type: 'bar',
-        data: chart_data,
-        options: {
-            animation: false,
-            elements:{
-                point:{
-                    radius: 0
-                }
-            },
-            plugins: {
-                legend: {
-                    labels:{
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                },
-            },
-            scales:{
-                x:{
-                    title: {
-                        display: true,
-                        text: 'days',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'humidity [%]',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                                    
-            },
-
-            }
+    function humidity_chart(data){        
+        const labels = data.date;
+        const wind = data.Humidity;
+            const chart_data = {
+            labels: labels,
+            datasets: [{
+                label: 'Humidity',
+                backgroundColor: 'rgb(0, 0, 255)',
+                borderColor: 'rgb(0, 0, 255)',
+                data: wind,
+                },                        
+            ]
         };
-
-        const humidityChart = new Chart(document.getElementById('humidityChart'),
-        config  
-        );
-
-        // dark/light mode -- start    
-        changeViewMode(humidityChart)  
-        // dark/light mode -- end
-        }
-
-
-    function matrix_chart(data){
-            
-    const chart_data = {
-    datasets: [{
-        label: 'Matrix',
-        data: data,            
-        backgroundColor(context) {
-        const value = context.dataset.data[context.dataIndex].v;
-        const alpha = 255 - Math.abs(value * 255);
-        return `rgb(10, ${alpha}, 255)`;
-        },
-        
-        borderWidth: 1,
-        width: ({chart}) => (chart.chartArea || {}).width / 7 - 1,
-        height: ({chart}) =>(chart.chartArea || {}).height / 7 - 1
-        }]
-        };
-
         const config = {
-            type: 'matrix',
+            type: 'bar',
             data: chart_data,
             options: {
+                animation: false,
+                elements:{
+                    point:{
+                        radius: 0
+                    }
+                },
                 plugins: {
-                legend: false,
-                tooltip: {
-                    callbacks: {
-                    title() {
-                        return '';
+                    legend: {
+                        labels:{
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
                     },
-                    label(context) {
-                        const v = context.dataset.data[context.dataIndex];
-                        return ['x: ' + v.x, 'y: ' + v.y, 'correlation: ' + v.v];
-                    }
-                    }
-                }
                 },
-                scales: {
-                x: {
-                    type: 'category',
-                    labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
-                    ticks: {
-                        display: true,
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
+                scales:{
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'days',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
                     },
-                    },
-                    grid: {
-                    display: false
-                    }
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'humidity [%]',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },                                        
                 },
-                y: {
-                    type: 'category',
-                    labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
-                    offset: true,
-                    ticks: {
-                        display: true,
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                    },
-                    },
-                    grid: {
-                    display: false
-                    }
                 }
-                }
-            }
-        };
-            
-        const matrixChart = new Chart(document.getElementById('matrixChart'),
-        config  
-        );           
-
-        // dark/light mode -- start    
-        changeViewMatrixMode(matrixChart)  
-        // dark/light mode -- end
-        }
-
-
-        const selected_station = document.getElementById('stations-list')
-
-        selected_station.addEventListener('change', () => {
-            const station_name = selected_station.value
-            select_station(station_name)
-        })
-
-        function select_station(station_name){
-            const url =  "{% url 'select-station' %}"
-            fetch(url, {
-                method:'POST',
-                headers:{
-                    'Content-Type':'application/json',
-                    'X-CSRFToken': csrftoken,
-                },
-                body:JSON.stringify({
-                    'station_name': station_name,                    
-                })
-            })
-            .then((response) => {
-                return response.json()
-            })
-            .then((data) => {
-                location.reload()
-            })
+            };
+            const humidityChart = new Chart(document.getElementById('humidityChart'),
+            config  
+            );
+        // view mode   
+        changeViewMode(humidityChart)  
     }
-         
 
+    function matrix_chart(data){            
+        const chart_data = {
+        datasets: [{
+            label: 'Matrix',
+            data: data,            
+            backgroundColor(context) {
+            const value = context.dataset.data[context.dataIndex].v;
+            const alpha = 255 - Math.abs(value * 255);
+            return `rgb(10, ${alpha}, 255)`;
+            },            
+            borderWidth: 1,
+            width: ({chart}) => (chart.chartArea || {}).width / 7 - 1,
+            height: ({chart}) =>(chart.chartArea || {}).height / 7 - 1
+            }]
+            };
+            const config = {
+                type: 'matrix',
+                data: chart_data,
+                options: {
+                    plugins: {
+                    legend: false,
+                    tooltip: {
+                        callbacks: {
+                        title() {
+                            return '';
+                        },
+                        label(context) {
+                            const v = context.dataset.data[context.dataIndex];
+                            return ['x: ' + v.x, 'y: ' + v.y, 'correlation: ' + v.v];
+                        }
+                        }
+                    }
+                    },
+                    scales: {
+                    x: {
+                        type: 'category',
+                        labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
+                        ticks: {
+                            display: true,
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                        },
+                        },
+                        grid: {
+                        display: false
+                        }
+                    },
+                    y: {
+                        type: 'category',
+                        labels: ['Tmin', 'Tmax', 'Tmean', 'Tsoil', 'Humidity', 'Wind', 'Overcast'],
+                        offset: true,
+                        ticks: {
+                            display: true,
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                        },
+                        },
+                        grid: {
+                        display: false
+                        }
+                    }
+                    }
+                }
+            };                
+            const matrixChart = new Chart(document.getElementById('matrixChart'),
+            config  
+            );        
+        // view mode   
+        changeViewMatrixMode(matrixChart)  
+    }
+
+    // select weather station and send name to backend
+    const selected_station = document.getElementById('stations-list')
+    selected_station.addEventListener('change', () => {
+        const station_name = selected_station.value
+        select_station(station_name)
+    })
+    function select_station(station_name){
+        const url =  "{% url 'select-station' %}"
+        fetch(url, {
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body:JSON.stringify({
+                'station_name': station_name,                    
+            })
+        })
+        .then((response) => {
+            return response.json()
+        })
+        .then((data) => {
+            location.reload()
+        })
+    }         
     </script>
     {% endblock %}
 

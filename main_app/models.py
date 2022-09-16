@@ -1,8 +1,5 @@
 from django.db import models
-
-# Create your models here.
 from django.utils.text import slugify
-
 
 class DailyMeasurement(models.Model):
     date = models.DateField()
@@ -86,7 +83,6 @@ class StationsMeasurement(models.Model):
     Humidity = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     Wind = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
     Overcast = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-
 
     def __str__(self):
         return f'{self.station}: {self.date}'

@@ -6,17 +6,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Title</title>
-    
+    <title>Weather tracker</title>    
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-
-
 </head>
 <body>
 
 {% block charts %}
     <main>
-
         <div class="main-charts">
             <div class="chart-box">
                 <h2>Temperature - KIELCE</h2>
@@ -63,7 +59,6 @@
                     </div> 
                 </div>
             </div>
-
             <div class="chart-box">
                 <h2>Temperature difference</h2>
                 <div class="temp-chart">
@@ -118,27 +113,20 @@
                     </div> 
                 </div>
             </div>
-        </div>
-
-
-        
-
-   
+        </div>     
     </main>
 {% endblock %}
 
-
-
 {% block scripts %}
 <script >   
+    // receiving data from backend
     var endpoint = 'api/data'
     $.ajax({
         method: 'GET',
         url: endpoint,
         success: function(weather_data){
-            console.log(weather_data)
-            const xScalelength = weather_data.hours_list.length
-            
+            // creating charts
+            const xScalelength = weather_data.hours_list.length  
             temp_chart(weather_data, xScalelength)
             wind_chart(weather_data, xScalelength)            
             deltaTchart(weather_data, xScalelength)
@@ -161,74 +149,12 @@
         }
     })
 
-    // function checkMode(){
-    //     let lMode = localStorage.getItem('l-mode')
-    //     let lightMode 
-
-    //     if(lMode === null){
-    //         lightMode = 1 // 1 = dark; 0 = light
-    //     }else{
-    //         lightMode = parseInt(lMode)
-    //     }
-        
-    //     return lightMode
-    // }
-
-    // function darkModeChart(Chart){
-    //     Chart.config.options.plugins.legend.labels.color = '#e8e8e8'
-    //     Chart.config.options.scales.x.title.color = '#e8e8e8'
-    //     Chart.config.options.scales.x.grid.color = '#e8e8e8'
-    //     Chart.config.options.scales.x.ticks.color = '#e8e8e8'
-    //     Chart.config.options.scales.y.title.color = '#e8e8e8'
-    //     Chart.config.options.scales.y.grid.color = '#e8e8e8'
-    //     Chart.config.options.scales.y.ticks.color = '#e8e8e8'
-    //     Chart.update()
-    // }
-
-    // function lightModeChart(Chart){
-    //     Chart.config.options.plugins.legend.labels.color = 'black'
-    //     Chart.config.options.scales.x.title.color = 'black'
-    //     Chart.config.options.scales.x.grid.color = 'black'
-    //     Chart.config.options.scales.x.ticks.color = 'black'
-    //     Chart.config.options.scales.y.title.color = 'black'
-    //     Chart.config.options.scales.y.grid.color = 'black'
-    //     Chart.config.options.scales.y.ticks.color = 'black'
-    //     Chart.update()
-    // }
-
-    // function changeViewMode(Chart){
-    //     let lightMode = checkMode()
-    //     const bulb = document.querySelector('#bulb')    
-
-    //     if(lightMode === 1){
-    //         darkModeChart(Chart)                             
-    //     }else{
-    //         lightModeChart(Chart)     
-    //     }
-        
-    //     bulb.addEventListener('click', function(){
-    //         if(lightMode === 1){
-    //             lightModeChart(Chart)
-    //             lightMode = 0
-    //             localStorage.setItem('l-mode', lightMode)            
-    //         }else{
-    //             darkModeChart(Chart)
-    //             lightMode = 1
-    //             localStorage.setItem('l-mode', lightMode)
-    //         }
-    //     })
-    // }
-    
     function temp_chart(data, xScalelength){
-
         let hours_list = data.hours_list
         let measurement_temp_list = data.measurement_temp_list
         let forecast_1_temp_list = data.forecast_1_temp_list
         let forecast_2_temp_list = data.forecast_2_temp_list
-        let forecast_3_temp_list = data.forecast_3_temp_list
-
-      
-
+        let forecast_3_temp_list = data.forecast_3_temp_list    
         const labels = hours_list;
         const chart_data = {
             labels: labels,
@@ -258,7 +184,6 @@
                 }
             ]
         };
-
         const config = {
             type: 'line',
             data: chart_data,
@@ -315,65 +240,239 @@
                                 family: 'Anonymous Pro',
                             }, 
                         }
-                    },
-                                        
+                    },                                        
                 },
-
             }
         };
-
         const tempChart = new Chart(document.getElementById('tempChart'),
         config  
-        );
-        
-        // dark/light mode -- start    
+        );        
+        // view mode   
             changeViewMode(tempChart)  
-
-        // dark/light mode -- end
     }
 
     function wind_chart(data, xScalelength){
-
-    let hours_list = data.hours_list
-    let measurement_wind_list = data.measurement_wind_list
-    let forecast_1_wind_list = data.forecast_1_wind_list
-    let forecast_2_wind_list = data.forecast_2_wind_list
-    let forecast_3_wind_list = data.forecast_3_wind_list
-
-
-
-    const labels = hours_list;
-    const chart_data = {
+        let hours_list = data.hours_list
+        let measurement_wind_list = data.measurement_wind_list
+        let forecast_1_wind_list = data.forecast_1_wind_list
+        let forecast_2_wind_list = data.forecast_2_wind_list
+        let forecast_3_wind_list = data.forecast_3_wind_list
+        const labels = hours_list;
+        const chart_data = {
+                labels: labels,
+                datasets: [{
+                    label: 'Real wind speed',
+                    backgroundColor: 'rgb(255, 0, 0)',
+                    borderColor: 'rgb(255, 0, 0)',
+                    data: measurement_wind_list,
+                    },
+                    {
+                    label: 'Forecast #1',
+                    backgroundColor: 'rgb(0, 204, 0)',
+                    borderColor: 'rgb(0, 204, 0)',
+                    data: forecast_1_wind_list,
+                    },
+                    {
+                    label: 'Forecast #2',
+                    backgroundColor: 'rgb(0, 0, 255)',
+                    borderColor: 'rgb(0, 0, 255)',
+                    data: forecast_2_wind_list,
+                    },
+                    {
+                    label: 'Forecast #3',
+                    backgroundColor: 'rgb(0, 255, 255)',
+                    borderColor: 'rgb(0, 255, 255)',
+                    data: forecast_3_wind_list,
+                    }
+                ]
+            };
+            const config = {
+                type: 'line',
+                data: chart_data,
+                options: {
+                    plugins: {
+                        legend: {
+                            labels:{
+                                color: '#e8e8e8',
+                                font:{
+                                    family: 'Anonymous Pro',
+                                }, 
+                            },
+                        },
+                    },
+                    scales:{
+                        x:{
+                            title: {
+                                display: true,
+                                text: 'last ' + xScalelength + ' hours',
+                                color: '#e8e8e8',
+                                font:{
+                                    family: 'Anonymous Pro',
+                                },                         
+                            },
+                            grid: {
+                                color: '#e8e8e8',
+                                borderWidth: 1,
+                                lineWidth: 0.2,
+                            },
+                            ticks: {
+                                color: '#e8e8e8',
+                                font:{
+                                    family: 'Anonymous Pro',
+                                }, 
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'wind speed [m/s]',
+                                color: '#e8e8e8',
+                                font:{
+                                    family: 'Anonymous Pro',
+                                }, 
+                            },
+                            grid: {
+                                color: '#e8e8e8',
+                                borderWidth: 1,
+                                lineWidth: 0.2,
+                            },
+                            ticks: {
+                                color: '#e8e8e8',
+                                font:{
+                                    family: 'Anonymous Pro',
+                                }, 
+                            }
+                        },                                            
+                    },
+                }
+            };
+        const windChart = new Chart(document.getElementById('windChart'),
+        config  
+        );
+        // view mode   
+        changeViewMode(windChart)  
+    }    
+    
+    function deltaTchart(data, xScalelength){   
+        const labels = data.hours_list;
+        const chart_data = {
             labels: labels,
             datasets: [{
-                label: 'Real wind speed',
-                backgroundColor: 'rgb(255, 0, 0)',
-                borderColor: 'rgb(255, 0, 0)',
-                data: measurement_wind_list,
+                label: 'Forecast #1',            
+                data: data.m_f1_temp,
+                backgroundColor: 'rgb(0, 204, 0)',
+                borderColor: 'rgb(0, 204, 0)',            
+            },
+            {
+                label: 'Forecast #2',            
+                data: data.m_f2_temp,
+                backgroundColor: 'rgb(0, 0, 255)',
+                borderColor: 'rgb(0, 0, 255)',            
+            },
+            {
+                label: 'Forecast #3',            
+                data: data.m_f3_temp,
+                backgroundColor: 'rgb(0, 255, 255)',
+                borderColor: 'rgb(0, 255, 255)',            
+            },
+        ]}            
+        const config = {
+            type: 'bar',
+            data: chart_data,
+            options: {
+                plugins: {
+                    legend: {
+                        labels:{
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                    },
                 },
-                {
-                label: 'Forecast #1',
+                scales:{                
+                    x:{
+                        title: {
+                            display: true,
+                            text: 'last ' + xScalelength + ' hours',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Delta T [°C]',
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        },
+                        grid: {
+                            color: '#e8e8e8',
+                            borderWidth: 1,
+                            lineWidth: 0.2,
+                        },
+                        ticks: {
+                            color: '#e8e8e8',
+                            font:{
+                                family: 'Anonymous Pro',
+                            }, 
+                        }
+                    },                                        
+                },
+            }
+        };
+        const deltaTchart = new Chart(document.getElementById('deltaTchart'),
+        config  
+        );
+        // view mode   
+        changeViewMode(deltaTchart)  
+    }
+
+    function gauss_24_chart(data){   
+        const chart_data = {
+            datasets: [{
+                label: 'Forecast #1',            
+                data: data.f1_gauss,
                 backgroundColor: 'rgb(0, 204, 0)',
                 borderColor: 'rgb(0, 204, 0)',
-                data: forecast_1_wind_list,
-                },
-                {
-                label: 'Forecast #2',
+                showLine: true,
+                tension: 0.4,
+            },
+            {
+                label: 'Forecast #2',            
+                data: data.f2_gauss,
                 backgroundColor: 'rgb(0, 0, 255)',
                 borderColor: 'rgb(0, 0, 255)',
-                data: forecast_2_wind_list,
-                },
-                {
-                label: 'Forecast #3',
+                showLine: true,
+                tension: 0.4,
+            },
+            {
+                label: 'Forecast #3',            
+                data: data.f3_gauss,
                 backgroundColor: 'rgb(0, 255, 255)',
                 borderColor: 'rgb(0, 255, 255)',
-                data: forecast_3_wind_list,
-                }
-            ]
-        };
-
+                showLine: true,
+                tension: 0.4,
+            },
+        ]}            
         const config = {
-            type: 'line',
+            type: 'scatter',
             data: chart_data,
             options: {
                 plugins: {
@@ -387,14 +486,16 @@
                     },
                 },
                 scales:{
+                    
                     x:{
+                        type: 'linear',
                         title: {
                             display: true,
-                            text: 'last ' + xScalelength + ' hours',
+                            text: 'Delta T [°C]',
                             color: '#e8e8e8',
                             font:{
                                 family: 'Anonymous Pro',
-                            },                         
+                            }, 
                         },
                         grid: {
                             color: '#e8e8e8',
@@ -406,12 +507,11 @@
                             font:{
                                 family: 'Anonymous Pro',
                             }, 
-                        }
+                        },                        
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'wind speed [m/s]',
                             color: '#e8e8e8',
                             font:{
                                 family: 'Anonymous Pro',
@@ -428,265 +528,18 @@
                                 family: 'Anonymous Pro',
                             }, 
                         }
-                    },
-                                        
+                    },                                        
                 },
-
             }
         };
-
-    const windChart = new Chart(document.getElementById('windChart'),
-    config  
-    );
-    // dark/light mode -- start    
-        changeViewMode(windChart)  
-
-    // dark/light mode -- end
+        const Histogram = new Chart(document.getElementById('gauss24Chart'),
+        config
+        );
+        // view mode   
+        changeViewMode(Histogram)  
     }    
-    
-    function deltaTchart(data, xScalelength){   
-
-    const labels = data.hours_list;
-
-    const chart_data = {
-        labels: labels,
-        datasets: [{
-            label: 'Forecast #1',            
-            data: data.m_f1_temp,
-            backgroundColor: 'rgb(0, 204, 0)',
-            borderColor: 'rgb(0, 204, 0)',            
-        },
-        {
-            label: 'Forecast #2',            
-            data: data.m_f2_temp,
-            backgroundColor: 'rgb(0, 0, 255)',
-            borderColor: 'rgb(0, 0, 255)',            
-        },
-        {
-            label: 'Forecast #3',            
-            data: data.m_f3_temp,
-            backgroundColor: 'rgb(0, 255, 255)',
-            borderColor: 'rgb(0, 255, 255)',            
-        },
-    ]}            
-    const config = {
-        type: 'bar',
-        data: chart_data,
-        options: {
-            plugins: {
-                legend: {
-                    labels:{
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                },
-            },
-            scales:{                
-                x:{
-                    title: {
-                        display: true,
-                        text: 'last ' + xScalelength + ' hours',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Delta T [°C]',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                                    
-            },
-
-        }
-    };
-
-const deltaTchart = new Chart(document.getElementById('deltaTchart'),
-config  
-);
-// dark/light mode -- start    
-    changeViewMode(deltaTchart)  
-
-// dark/light mode -- end
-}
-
-    function gauss_24_chart(data){   
-    const chart_data = {
-        datasets: [{
-            label: 'Forecast #1',            
-            data: data.f1_gauss,
-            backgroundColor: 'rgb(0, 204, 0)',
-            borderColor: 'rgb(0, 204, 0)',
-            showLine: true,
-            tension: 0.4,
-        },
-        {
-            label: 'Forecast #2',            
-            data: data.f2_gauss,
-            backgroundColor: 'rgb(0, 0, 255)',
-            borderColor: 'rgb(0, 0, 255)',
-            showLine: true,
-            tension: 0.4,
-        },
-        {
-            label: 'Forecast #3',            
-            data: data.f3_gauss,
-            backgroundColor: 'rgb(0, 255, 255)',
-            borderColor: 'rgb(0, 255, 255)',
-            showLine: true,
-            tension: 0.4,
-        },
-    ]}            
-    const config = {
-        type: 'scatter',
-        data: chart_data,
-        options: {
-            plugins: {
-                legend: {
-                    labels:{
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                },
-            },
-            scales:{
-                
-                x:{
-                    type: 'linear',
-                    title: {
-                        display: true,
-                        text: 'Delta T [°C]',
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    
-                },
-                y: {
-                    title: {
-                        display: true,
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    },
-                    grid: {
-                        color: '#e8e8e8',
-                        borderWidth: 1,
-                        lineWidth: 0.2,
-                    },
-                    ticks: {
-                        color: '#e8e8e8',
-                        font:{
-                            family: 'Anonymous Pro',
-                        }, 
-                    }
-                },
-                                    
-            },
-
-        }
-    };
-    const Histogram = new Chart(document.getElementById('gauss24Chart'),
-    config
-    );
-// dark/light mode -- start    
-    changeViewMode(Histogram)  
-
-// dark/light mode -- end
-
-}
-    // // CSS light mode
-    // let lightMode = checkMode()
-    
-    // const bulb = document.querySelector('#bulb')
-    // const articleDiv = document.querySelectorAll('.chart-box')
-
-    // function darkModeCSS(articleDiv){
-    //     document.body.style.backgroundColor = 'rgb(26, 26, 26)';
-    //     document.body.style.color = 'white'
-    //     for(var i = 0; i < articleDiv.length; i++){
-    //         articleDiv[i].classList.remove('lm')
-    //     }
-    // }
-    // function lightModeCSS(articleDiv){
-    //     document.body.style.backgroundColor = 'white';
-    //     document.body.style.color = 'black'
-    //     for(var i = 0; i < articleDiv.length; i++){
-    //         articleDiv[i].classList.add('lm')            
-    //     }
-    // }
-
-    // if(lightMode === 1){        
-    //     darkModeCSS(articleDiv)             
-    // }else{
-    //     lightModeCSS(articleDiv)        
-    // }
-       
-    // bulb.addEventListener('click', function(){
-    //     if(lightMode === 1){
-    //         lightModeCSS(articleDiv)
-    //         lightMode = 0
-    //         localStorage.setItem('l-mode', lightMode)
-            
-    //     }else{
-    //         darkModeCSS(articleDiv)
-    //         lightMode = 1
-    //         localStorage.setItem('l-mode', lightMode)
-    //     }
-    // })    
-
 </script>
-
 {% endblock %}
 
-
 </body>
-
 </html>

@@ -5,49 +5,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Contact</title>
 </head>
 <body>
-
-    {% block charts %}
+        {% block charts %}
     <main>
-
-            <div class="chart-box">
-                <h2 id="contact-heading">Contact me!</h2>
-                    <div>
-                        <div class="msg">
-                            <label for="contact-msg">Message:</label>
-                            <textarea id="contact-msg" class="contact-msg-area"></textarea>
-                        </div>
-                        <div class="msg">
-                            <label for="contact-mail">Email:</label>
-                            <input type="email" id="contact-mail">
-                        </div>
-                        <div class="msg">
-                            <label for="contact-name">Name:</label>
-                            <input type="text"id="contact-name">
-                        </div>
-                        <button class="contact-btn" type="submit">Send message</button>
-                    </div>                
-                    
-                </div>
-            </div> 
+        <div class="chart-box">
+            <h2 id="contact-heading">Contact me!</h2>
+                <div>
+                    <div class="msg">
+                        <label for="contact-msg">Message:</label>
+                        <textarea id="contact-msg" class="contact-msg-area"></textarea>
+                    </div>
+                    <div class="msg">
+                        <label for="contact-mail">Email:</label>
+                        <input type="email" id="contact-mail">
+                    </div>
+                    <div class="msg">
+                        <label for="contact-name">Name:</label>
+                        <input type="text"id="contact-name">
+                    </div>
+                    <button class="contact-btn" type="submit">Send message</button>
+                </div>                
+                
+            </div>
+        </div> 
     </main>
     {% endblock %}
 
     {% block scripts %}
     <script>
+        
+
+        // fetch msg data
         const sendMsg = document.querySelector('.contact-btn')
         const textMsg = document.querySelector('#contact-msg')
         const emailMsg = document.querySelector('#contact-mail')
         const nameMsg = document.querySelector('#contact-name')
         const head = document.querySelector('#contact-heading')
 
-        sendMsg.addEventListener('click', () => {
-            
-            let msg = `Message: ${textMsg.value}, by: ${nameMsg.value} [${emailMsg.value}]`
-            
-
+        sendMsg.addEventListener('click', () => {            
+            let msg = `Message: ${textMsg.value}, by: ${nameMsg.value} [${emailMsg.value}]`          
             if(msg !== `Message: , by:  []`){
                 sendEmail(msg)
                 showAlert('The message has been send!')
@@ -80,6 +78,14 @@
                 location.reload()
             })
         }
+
+        // hide home-page btns
+        const navBtns = document.querySelectorAll('.chart-range')
+        for(let i = 0; navBtns.length; i++){
+            navBtns[i].style.visibility = 'hidden'
+        }
+
+        
     </script>
     {% endblock %}
 </body>

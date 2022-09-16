@@ -1,58 +1,37 @@
-import csv
 import json
 import os
+from .csvLoader import importCSVtoDB, importCSVtoDB_t, validation_of_stations
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.core.mail import send_mail
-# from django.templatetags.static import static
-
-from .models import *
-# Create your views here.
-import requests
-from .utils import *
-from datetime import datetime, date
-from .csvLoader import importCSVtoDB, importCSVtoDB_t, validation_of_stations
-import numpy as np
-
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from .models import *
+from .functions import *
 
 from dotenv import load_dotenv
 load_dotenv()
 
-
-from .functions import *
-
 def HomePage(request):
-
-
     context = {
     }
-
     return render(request, 'home-page.html', context)
 
 def Contact(request):
-
     context = {
-
     }
     return render(request, 'contact.html', context)
 
 def HistoricalData(request):
-
-
-
     context = {
     }
-
     return render(request, 'historical-data.html', context)
 
-
 @login_required
-def csvLoader(request):
+def csvLoader(request):     # hidden page to load csv files
 
     if request.method == "POST":
         if request.POST.get('submit_data'):
@@ -70,9 +49,6 @@ def csvLoader(request):
 
     return  render(request, 'csvLoader.html', {})
 
-
-import locale
-
 class WeatherHist(APIView):
     authentication_classes = []
     permission_classes = []
@@ -80,19 +56,19 @@ class WeatherHist(APIView):
     def get(self, request, format=None):
 
         if request.session.get('station_name'):
-            station_name = request.session.get('station_name')
+            station_name = request.session.get('station_name')      # get station via session storage
         else:
-            station_name = 'BORUCINO'
+            station_name = 'BORUCINO'       # deafult
 
         hist_data = historical_data(WeatherStation, StationsMeasurement, station_name)
 
+        # create stations selector list
         stations_list = []
         all_stations = WeatherStation.objects.all()
         for i in all_stations:
             stations_list.append(i.name)
 
-
-        extreme_values = {
+        extreme_values = {                  # send data with extreme values from arrays
             'Tmax':         round(max(hist_data['Tmax']), 1),
             'Tmin':         round(min(hist_data['Tmin']), 1),
             'Tsoil_max':    round(max(hist_data['Tsoil']), 1),
@@ -112,8 +88,6 @@ class WeatherHist(APIView):
 
         return Response(data)
 
-
-
 class WeatherLive(APIView):
     authentication_classes = []
     permission_classes = []
@@ -121,9 +95,9 @@ class WeatherLive(APIView):
     def get(self, request, format=None):
         # days to render
         if request.session.get('days_to_render'):
-            days_to_render = int(request.session.get('days_to_render'))
+            days_to_render = int(request.session.get('days_to_render'))     # get via session storage
         else:
-            days_to_render = 3
+            days_to_render = 3  # deafult
 
         days = days_to_render + 2
         hour_range = days_to_render * 24
@@ -165,6 +139,7 @@ class WeatherLive(APIView):
 
         return Response(data)
 
+# APIs to get data from JS
 def chartXscale(request):
     days_to_render = json.loads(request.body)
     request.session['days_to_render'] = days_to_render
@@ -180,7 +155,7 @@ def selectStation(request):
 def sendMsg(request):
     msg_data = json.loads(request.body)
 
-    send_mail(
+    send_mail(      # send msg ffrom contact form to my mailbox
         'Generic contact from website',
         msg_data,
         str(os.getenv('FROM_EMAIL_ADDRESS')),
