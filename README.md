@@ -87,7 +87,7 @@ To install application on local machine:
 ```bash
 gh repo clone Propsowicz/weather-tracker
 ```
-- install libraries (```requirements.txt``` file contains all needed libraries)
+- install the libraries (```requirements.txt``` file contains all needed libraries)
 ```bash
 pip install -r /path/requirements.txt
 ```
@@ -100,13 +100,17 @@ DATABASES = {
     }
 }
 ``` 
-- run app
+- run the app
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 ```
-
+- run celery and redis
+```bash
+celery -A weather_track.celery worker --pool=solo -l info
+celery -A weather_track beat -l info
+```
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
