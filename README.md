@@ -49,7 +49,7 @@ The application also presents and analyzes historical weather data from meteo st
 
 ## Description
 
-The application was created in 2 views mode. All data is sent to frontend through RESTFramework and rendered live to the charts. The website contains a contact form to communicate with the administator.
+The application was created in 2 views mode. All data is sent to frontend through Django RESTFramework and rendered live to the charts. The website contains a contact form to communicate with the administator.
 
 #### Weather Tracker
 
@@ -82,15 +82,19 @@ Historical data in dark mode:
 
 ## Installation
 
-File ```requirements.txt``` contains list of all needed libraries to run application.
-
-To clone application:
-
+To install application on local machine:
+- clone it
 ```bash
 gh repo clone Propsowicz/weather-tracker
 ```
+- install libraries (```requirements.txt``` file contains all needed libraries)
 ```bash
-https://github.com/Propsowicz/weather-tracker.git
+pip install -r /path/requirements.txt
+```
+- run app
+```bash
+python manage.py migrate
+python manage.py runserver
 ```
 
 ## Contributing
