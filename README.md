@@ -93,6 +93,7 @@ pip install -r /path/requirements.txt
 ```
 - run app
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 ```
