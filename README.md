@@ -91,6 +91,15 @@ gh repo clone Propsowicz/weather-tracker
 ```bash
 pip install -r /path/requirements.txt
 ```
+- connect to your local database (change database connection setting in settings.py). Below is sqlite3 connection.
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+``` 
 - run app
 ```bash
 python manage.py makemigrations
