@@ -54,7 +54,7 @@ class WeatherHist(APIView):
     permission_classes = []
 
     def get(self, request, format=None):
-
+        
         if request.session.get('station_name'):
             station_name = request.session.get('station_name')      # get station via session storage
         else:
