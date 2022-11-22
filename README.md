@@ -7,6 +7,10 @@ Weather tracker is an application which collects real weather measurments and co
 
 The application also presents and analyzes historical weather data from meteo stations.
 
+[update: 22.11.2022 - dockerized the whole application]
+
+![docker](https://github.com/Propsowicz/weather-tracker/blob/main/illustrations/docker-desktop.png?raw=true)
+
 ## Table of content
 
 [Technologies](#technologies)
@@ -47,6 +51,8 @@ The application also presents and analyzes historical weather data from meteo st
 
 ![Chart.js](https://img.shields.io/badge/chart.js-F5788D.svg?style=for-the-badge&logo=chart.js&logoColor=white)
 
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+
 ## Description
 
 The application was created in 2 views mode. All data is sent to frontend through Django RESTFramework and rendered live to the charts. The website contains a contact form to communicate with the administator.
@@ -62,6 +68,10 @@ If the application gets information about thunderstorm in local area, it sends s
 Archival data is gathered from .csv files by a simple script, which is avaible only to the admin user. Next, the data is saved in database and then analyzed to find the correlation between the measurements. 
 
 ## Illustrations
+
+Weather Tracker DEMO:
+
+![weather track - demo](https://github.com/Propsowicz/weather-tracker/blob/main/illustrations/weather-demo.gif?raw=true)
 
 Weather Tracker in light mode:
 
